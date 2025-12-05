@@ -54,7 +54,7 @@ These steps must be completed manually and cannot be automated:
 
 ### 4. Add GitHub Secrets
 
-1. Go to your GitHub repository: https://github.com/aifirstprogramming/aifirstplugin
+1. Go to your GitHub repository: https://github.com/aifirstprogramming/aifirstextension
 2. Navigate to **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Add the following secrets:
@@ -73,12 +73,12 @@ The following fields need to be added/updated in `package.json`:
   "publisher": "aifirstprogramming",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aifirstprogramming/aifirstplugin.git"
+    "url": "https://github.com/aifirstprogramming/aifirstextension.git"
   },
   "bugs": {
-    "url": "https://github.com/aifirstprogramming/aifirstplugin/issues"
+    "url": "https://github.com/aifirstprogramming/aifirstextension/issues"
   },
-  "homepage": "https://github.com/aifirstprogramming/aifirstplugin#readme",
+  "homepage": "https://github.com/aifirstprogramming/aifirstextension#readme",
   "keywords": [
     "ai",
     "programming",

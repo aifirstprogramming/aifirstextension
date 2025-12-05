@@ -128,7 +128,7 @@ You can access this walkthrough anytime from the VS Code welcome page or by sear
 
 ## Support
 
-For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/aifirstprogramming/aifirstplugin).
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/aifirstprogramming/aifirstextension).
 
 ## Authors
 
