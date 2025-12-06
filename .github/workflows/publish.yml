@@ -49,11 +49,13 @@ jobs:
               NEW_VERSION=${NEW_VERSION#v}
               echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
               echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+              echo "version_updated=true" >> $GITHUB_OUTPUT
             else
               # Strip 'v' prefix if present
               VERSION_TYPE=${VERSION_TYPE#v}
               echo "version=$VERSION_TYPE" >> $GITHUB_OUTPUT
               echo "version_type=custom" >> $GITHUB_OUTPUT
+              echo "version_updated=false" >> $GITHUB_OUTPUT
             fi
           else
             # Extract version from tag (e.g., v0.0.1 -> 0.0.1)
@@ -62,21 +64,32 @@ jobs:
             VERSION=${VERSION#refs/tags/}
             echo "version=$VERSION" >> $GITHUB_OUTPUT
             echo "version_type=tag" >> $GITHUB_OUTPUT
+            echo "version_updated=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Update package.json version
         run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          TARGET_VERSION="${{ steps.version.outputs.version }}"
-          if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
-            npm version $TARGET_VERSION --no-git-tag-version
+          if [ "${{ steps.version.outputs.version_updated }}" == "true" ]; then
+            # Version was already updated by npm version in previous step, just commit it
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add package.json
-            git commit -m "Bump version to $TARGET_VERSION" || exit 0
+            git commit -m "Bump version to ${{ steps.version.outputs.version }}" || exit 0
             git push || exit 0
           else
-            echo "Version already set to $TARGET_VERSION, skipping update"
+            # Version needs to be set manually (tag or custom version)
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            TARGET_VERSION="${{ steps.version.outputs.version }}"
+            if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
+              npm version $TARGET_VERSION --no-git-tag-version
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              git add package.json
+              git commit -m "Bump version to $TARGET_VERSION" || exit 0
+              git push || exit 0
+            else
+              echo "Version already set to $TARGET_VERSION, skipping update"
+            fi
           fi
 
       - name: Compile TypeScript
