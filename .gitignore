@@ -3,3 +3,18 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+
+# Claude Code per-project settings
+.claude/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# npm/yarn logs
+*.log
+npm-debug.log*
+yarn-error.log
+
+# JetBrains
+.idea/
