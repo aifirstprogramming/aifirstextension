@@ -1,18 +1,21 @@
 ## 🤖 Use with GitHub Copilot Chat
 
-Use GitHub Copilot Chat to generate code using the prompts from the AI First Programming books.
+You can use the AI First Book Examples model in two surfaces: **inline chat** (inserts code directly into your editor) or **chat panel** (renders code with Insert / Apply buttons). Pick whichever fits your workflow.
 
-### Instructions
+### Option A — Inline Chat (insert directly into your editor)
 
-1. **Invoke GitHub Copilot Chat**: Press `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac) to open the GitHub Copilot Chat interface.
+1. Open the file you want to write in (a new untitled file is fine)
+2. Press `Ctrl+I` (or `Cmd+I` on Mac) to open the inline chat above your cursor
+3. Paste the prompt and press `Enter`
+4. The book example is inserted into your file with the native **Keep / X** review overlay — click Keep to accept, X to discard
 
-2. **Paste the Prompt**: 
-   - Click in the chat input field
-   - Press `Ctrl+V` (or `Cmd+V` on Mac) to paste the prompt you copied
-   - The prompt text will appear in the chat
+### Option B — Chat Panel (read first, insert later)
 
-3. **Send the Prompt**: Press `Enter` or click the send button to generate code. The response will be based on examples from the books you're studying!
+1. Press `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac) to open the chat panel
+2. Paste the prompt and press `Enter`
+3. The response appears as a code block in the chat
+4. Click **Insert at Cursor** or **Apply** on the code block to add it to your editor
 
 ---
 
-**Note:** Make sure to switch to the AI First Book Examples model in the chat interface. Look for the model selector (usually at the top or in the input area), click on it, and select **"AI First Book Examples"** - the model you enabled in step 1. You only need to do this once - it will remain selected for future chats.
+**Note:** Make sure the AI First Book Examples model is selected in whichever surface you're using. Click the model dropdown and pick **"AI First Book Examples"** — the model you enabled in step 1. The selection sticks across future chats.

@@ -80,7 +80,7 @@
           {
             "id": "enable-model-provider",
             "title": "Enable AI First Book Examples",
-            "description": "Before you can use the AI First Book Examples model in VS Code's chat, you need to enable and select it.\n\n**Instructions:**\n1. Click the button below to copy the command and open the Command Palette\n2. Paste the command (Ctrl+V / Cmd+V) and press Enter\n3. Find \"AI First Book Examples\" in the Manage Models interface\n4. Enable the model by toggling it on\n5. Select it as your active model\n\n[Copy Command & Open Command Palette](command:ai-first-programming.copyManageModelsCommand)",
+            "description": "Before you can use the AI First Book Examples model in VS Code's chat, you need to make it visible in the chat picker.\n\n**Instructions:**\n1. Click the button below to copy the command and open the Command Palette\n2. Paste the command (Ctrl+V / Cmd+V) and press Enter\n3. In the Manage Models view, expand the **AI First** provider group\n4. Click the **eye icon** next to **AI First Book Examples** — the row should appear in bold once it's visible\n5. Close the dialog, then select the model from the chat model dropdown\n\n[Copy Command & Open Command Palette](command:ai-first-programming.copyManageModelsCommand)",
             "media": {
               "markdown": "media/walkthrough/enable-model-provider.md"
             }
@@ -112,7 +112,7 @@
           {
             "id": "use-with-copilot",
             "title": "Use with GitHub Copilot Chat",
-            "description": "Use GitHub Copilot Chat to generate code using the prompts from the AI First Programming books.\n\n**Instructions:**\n1. Invoke GitHub Copilot Chat with `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac)\n2. Paste the copied prompt with `Ctrl+V` (or `Cmd+V` on Mac)\n3. Send the prompt to generate code\n\n**Note:** Make sure to switch to the AI First Book Examples model in the chat interface. You only need to do this once - it will remain selected for future chats.",
+            "description": "Use the AI First Book Examples model to generate code from book prompts. Two surfaces work:\n\n**Inline chat (inserts into your editor):**\n1. Open a file and press `Ctrl+I` (or `Cmd+I` on Mac)\n2. Paste the prompt and press Enter\n3. The book example is inserted with a native Keep/X review overlay\n\n**Chat panel (read first, insert later):**\n1. Press `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac)\n2. Paste the prompt and press Enter\n3. Click **Insert at Cursor** or **Apply** on the rendered code block\n\n**Note:** Make sure **AI First Book Examples** is selected in the model dropdown. The selection sticks across future chats.",
             "media": {
               "markdown": "media/walkthrough/use-with-copilot.md"
             }

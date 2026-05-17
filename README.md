@@ -52,10 +52,17 @@ Each example view includes copy buttons:
 - **Copy Prompt**: Copies the prompt text to your clipboard
 - **Copy Response**: Copies the code response to your clipboard
 
-You can then:
+You can then use the prompt in either of two ways:
+
+**Inline chat (recommended for inserting code directly):**
 1. Open a new editor (`Ctrl+N` / `Cmd+N`)
-2. Paste the prompt into GitHub Copilot Chat (`Ctrl+Shift+I` / `Cmd+Shift+I`)
-3. Use the generated code, or if it doesn't match the book example, paste the response from the plugin
+2. Press `Ctrl+I` / `Cmd+I` to open the inline chat above your cursor
+3. Paste the prompt and press Enter — the book example is inserted with a native Keep/X review overlay
+
+**Chat panel (recommended for reading and comparing):**
+1. Open GitHub Copilot Chat with `Ctrl+Shift+I` / `Cmd+Shift+I`
+2. Paste the prompt and press Enter
+3. The response appears as a code block with **Insert at Cursor** / **Apply** buttons
 
 > **Tip**: We recommend always trying the prompt first, but don't hesitate to use the book response if needed!
 
@@ -86,10 +93,10 @@ This will bring up a pick list of available models.
 
 ### Step 4: Enable AI First Book Examples
 
-1. In the Manage Language Models dialog, find **"AI First Book Examples"** (it should be near the top alphabetically)
-2. Click on it to open the model settings
-3. Check the checkbox to **enable** the model
-4. Click **"OK"** to save your changes
+1. In the Manage Language Models dialog, expand the **"AI First"** provider group (it should be near the top alphabetically)
+2. Locate the **"AI First Book Examples"** model row
+3. Click the **eye icon** next to the model — when the row appears in bold, the model is visible in the chat picker. (The older "checkbox" UI was replaced in recent Copilot Chat builds.)
+4. Close the Manage Models dialog — your selection is saved automatically
 
 ### Step 5: Select the Model
 
@@ -105,6 +112,7 @@ Once enabled and selected, all your prompts will return the exact code responses
 - ✅ **Exact book examples**: Get the same code as shown in the book
 - ✅ **No token costs**: Complete all book exercises without using your Copilot quota
 - ✅ **Language-aware**: Automatically matches prompts based on your active editor's language
+- ✅ **Inline editing**: Use `Ctrl+I` / `Cmd+I` to insert book examples directly into your file with the native Keep/X diff review
 - ✅ **Practice mode**: Perfect for learning AI-assisted coding without worrying about limits
 
 > **Caution**: The AI First Book Model only works with individual GitHub plans like Free and Copilot Pro. If you have an enterprise GitHub license from your work, the "Manage Models…" menu item will be missing from the drop-down. To use the AI First Book Model, you will need to create a separate GitHub account and associate it with Copilot.

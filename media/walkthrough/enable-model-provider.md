@@ -13,15 +13,17 @@ Alternatively, you can manually open the Command Palette (`Ctrl+Shift+P` / `Cmd+
 ### Step 2: Enable the Model
 
 In the Manage Models interface:
-1. Look for **"AI First Book Examples"** in the list of available models
-2. Click the toggle or checkbox to **enable** the model
-3. The model should show as enabled/active
+1. Expand the **"AI First"** provider group (usually near the top alphabetically)
+2. Locate the **"AI First Book Examples"** model row
+3. Click the **eye icon** next to the model — when the row becomes bold, the model is visible in the chat picker
+
+> **Note**: Recent versions of Copilot Chat replaced the older checkbox with this eye icon. If the model row looks faded, click the eye to make it bold; faded rows are hidden from the chat picker.
 
 ### Step 3: Select the Model for Use
 
-1. In the Manage Models interface, find the **"AI First Book Examples"** model
-2. Click on it or use the dropdown to **select** it as your active model
-3. You may see a checkmark or highlight indicating it's selected
+1. Close the Manage Models dialog (your visibility choice is saved automatically)
+2. Open inline chat (`Ctrl+I` / `Cmd+I`) or the chat panel (`Ctrl+Shift+I` / `Cmd+Shift+I`)
+3. Open the model dropdown and pick **"AI First Book Examples"**
 
 ### What This Enables
 
