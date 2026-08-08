@@ -43,7 +43,7 @@ This extension provides an AIFirst Language Model Chat Provider that looks up pr
 ### 1. AIFirstLanguageModelProvider Class ✅ IMPLEMENTED
 
 **Key Methods:**
-- `provideLanguageModelChatInformation()`: Returns model information (id: 'ai-first-book-examples', family: 'AIFirst', version: '1.0.0')
+- `provideLanguageModelChatInformation()`: Returns model information (id: 'ai-first-programming', family: 'AIFirst', version: '1.0.0')
 - `provideLanguageModelChatResponse()`: Handles chat requests, matches prompts, returns responses
 - `provideTokenCount()`: Estimates token count (approximately 4 characters per token)
 - `loadPromptsFromBooks()`: Loads and indexes all prompts from JSON files
@@ -114,7 +114,7 @@ The extension handles the existing JSON structure:
   "languageModelChatProviders": [
     {
       "vendor": "ai-first",
-      "displayName": "AI First Book Examples"
+      "displayName": "AI First Programming"
     }
   ]
 }
@@ -132,7 +132,7 @@ The extension handles the existing JSON structure:
 
 **Walkthroughs:**
 - Getting started walkthrough with 5 steps:
-  1. Enable AI First Book Examples model
+  1. Enable AI First Programming model
   2. Explore the Book Content
   3. Open an Example
   4. Copy the Example Code

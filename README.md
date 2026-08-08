@@ -7,9 +7,9 @@ A companion extension for the AI First Programming book series that provides eas
 - **Book Content Browser**: Navigate through book content organized by book, section, chapter, and example in a convenient sidebar tree view
 - **Example Viewer**: View detailed prompts and code responses with syntax highlighting
 - **Copy Functionality**: Easily copy prompts and responses to use in your code editor
-- **AI First Book Examples Model**: A custom language model that returns exact code examples from the books
+- **AI First Programming Model**: A custom language model that returns exact code examples from the books
 - **Language-Aware Matching**: Automatically matches prompts based on your active editor's programming language
-- **Zero Token Cost**: Use the AI First Book Examples model without consuming your Copilot token quota
+- **Zero Token Cost**: Use the AI First Programming model without consuming your Copilot token quota
 
 ## Requirements
 
@@ -66,7 +66,7 @@ You can then use the prompt in either of two ways:
 
 > **Tip**: We recommend always trying the prompt first, but don't hesitate to use the book response if needed!
 
-## Enabling the AI First Book Examples Model
+## Enabling the AI First Programming Model
 
 The AI First Programming extension includes a custom language model that returns exact code examples from the books. This feature allows you to practice using AI features in VS Code without using your Copilot token quota.
 
@@ -91,10 +91,10 @@ This will bring up a pick list of available models.
 1. In the model selection drop-down, click on **"Manage Models…"** (usually the last item)
 2. This opens the Manage Language Models dialog
 
-### Step 4: Enable AI First Book Examples
+### Step 4: Enable AI First Programming
 
 1. In the Manage Language Models dialog, expand the **"AI First"** provider group (it should be near the top alphabetically)
-2. Locate the **"AI First Book Examples"** model row
+2. Locate the **"AI First Programming"** model row
 3. Click the **eye icon** next to the model — when the row appears in bold, the model is visible in the chat picker. (The older "checkbox" UI was replaced in recent Copilot Chat builds.)
 4. Close the Manage Models dialog — your selection is saved automatically
 
@@ -102,7 +102,7 @@ This will bring up a pick list of available models.
 
 1. Return to your AI prompt
 2. Click the model selection drop-down again
-3. You should now see **"AI First Book Examples"** as an available option
+3. You should now see **"AI First Programming"** as an available option
 4. Select it to start using the book examples model
 
 ### Using the Model
@@ -115,12 +115,12 @@ Once enabled and selected, all your prompts will return the exact code responses
 - ✅ **Inline editing**: Use `Ctrl+I` / `Cmd+I` to insert book examples directly into your file with the native Keep/X diff review
 - ✅ **Practice mode**: Perfect for learning AI-assisted coding without worrying about limits
 
-> **Caution**: The AI First Book Model only works with individual GitHub plans like Free and Copilot Pro. If you have an enterprise GitHub license from your work, the "Manage Models…" menu item will be missing from the drop-down. To use the AI First Book Model, you will need to create a separate GitHub account and associate it with Copilot.
+> **Caution**: The AI First Programming model only works with individual GitHub plans like Free and Copilot Pro. If you have an enterprise GitHub license from your work, the "Manage Models…" menu item will be missing from the drop-down. To use the AI First Programming model, you will need to create a separate GitHub account and associate it with Copilot.
 
 ## Getting Started Walkthrough
 
 When you first install the extension, VS Code will offer a getting started walkthrough that guides you through:
-1. Enabling the AI First Book Examples model
+1. Enabling the AI First Programming model
 2. Exploring the book content
 3. Opening examples
 4. Copying example code

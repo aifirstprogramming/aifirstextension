@@ -25,8 +25,8 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 	): Promise<vscode.LanguageModelChatInformation[]> {
 		return [
 			{
-				id: 'ai-first-book-examples',
-				name: 'AI First Book Examples',
+				id: 'ai-first-programming',
+				name: 'AI First Programming',
 				family: 'AIFirst',
 				version: '1.0.0',
 				maxInputTokens: 128000,

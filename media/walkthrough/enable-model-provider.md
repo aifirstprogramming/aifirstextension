@@ -1,6 +1,6 @@
-## 🤖 Enable AI First Book Examples
+## 🤖 Enable AI First Programming
 
-To use the AI First Book Examples model in VS Code's chat features, you need to enable and select it first.
+To use the AI First Programming model in VS Code's chat features, you need to enable and select it first.
 
 ### Step 1: Open Manage Models
 
@@ -14,7 +14,7 @@ Alternatively, you can manually open the Command Palette (`Ctrl+Shift+P` / `Cmd+
 
 In the Manage Models interface:
 1. Expand the **"AI First"** provider group (usually near the top alphabetically)
-2. Locate the **"AI First Book Examples"** model row
+2. Locate the **"AI First Programming"** model row
 3. Click the **eye icon** next to the model — when the row becomes bold, the model is visible in the chat picker
 
 > **Note**: Recent versions of Copilot Chat replaced the older checkbox with this eye icon. If the model row looks faded, click the eye to make it bold; faded rows are hidden from the chat picker.
@@ -23,12 +23,12 @@ In the Manage Models interface:
 
 1. Close the Manage Models dialog (your visibility choice is saved automatically)
 2. Open inline chat (`Ctrl+I` / `Cmd+I`) or the chat panel (`Ctrl+Shift+I` / `Cmd+Shift+I`)
-3. Open the model dropdown and pick **"AI First Book Examples"**
+3. Open the model dropdown and pick **"AI First Programming"**
 
 ### What This Enables
 
 Once enabled and selected, you can:
-- Use the AI First Book Examples model in VS Code's chat interface
+- Use the AI First Programming model in VS Code's chat interface
 - Get responses based on examples from the AI First Programming books
 - Access programming examples directly through chat prompts
 

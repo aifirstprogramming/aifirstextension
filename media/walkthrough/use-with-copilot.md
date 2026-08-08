@@ -1,6 +1,6 @@
 ## 🤖 Use with GitHub Copilot Chat
 
-You can use the AI First Book Examples model in two surfaces: **inline chat** (inserts code directly into your editor) or **chat panel** (renders code with Insert / Apply buttons). Pick whichever fits your workflow.
+You can use the AI First Programming model in two surfaces: **inline chat** (inserts code directly into your editor) or **chat panel** (renders code with Insert / Apply buttons). Pick whichever fits your workflow.
 
 ### Option A — Inline Chat (insert directly into your editor)
 
@@ -18,4 +18,4 @@ You can use the AI First Book Examples model in two surfaces: **inline chat** (i
 
 ---
 
-**Note:** Make sure the AI First Book Examples model is selected in whichever surface you're using. Click the model dropdown and pick **"AI First Book Examples"** — the model you enabled in step 1. The selection sticks across future chats.
+**Note:** Make sure the AI First Programming model is selected in whichever surface you're using. Click the model dropdown and pick **"AI First Programming"** — the model you enabled in step 1. The selection sticks across future chats.

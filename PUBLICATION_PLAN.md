@@ -123,7 +123,7 @@ All notable changes to the "AI First Programming" extension will be documented i
 - Book content browser with hierarchical navigation
 - Example viewer with syntax highlighting
 - Copy functionality for prompts and responses
-- AI First Book Examples Language Model Chat Provider
+- AI First Programming Language Model Chat Provider
 - Language-aware prompt matching
 - Getting started walkthrough
 ```
