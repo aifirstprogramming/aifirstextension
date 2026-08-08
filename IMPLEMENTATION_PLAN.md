@@ -1,5 +1,21 @@
 # AIFirst Language Model Chat Provider - Implementation Plan
 
+> **Partly superseded as of 1.5.0.** This document describes the original design,
+> in which the books lived in a bundled `book_content/` directory and each consumer
+> walked that JSON and matched prompts itself.
+>
+> Since 1.5.0 the content and the matching both come from the shared
+> [`@aifirst/content`](https://github.com/aifirstprogramming/aifirstcontent) package,
+> which the `aifirst` CLI also consumes. `src/bookContent.ts` loads the books once
+> via the package's `books/*.json` subpath export; `AIFirstLanguageModelProvider`
+> calls the package's `findMatch`/`unwrapPromptTag` rather than its own matcher, and
+> `AIBookProvider` builds its tree from the package's normalized `Content`.
+>
+> Everything below about the VS Code surfaces — the chat provider contract, inline
+> chat, the tree view and webview — still holds. Only the loading and matching
+> sections are historical. Read references to `book_content/`, `loadPromptsFromBooks`,
+> `findMatchingPrompt` and `searchEntries` as a record of what the package now owns.
+
 ## Overview
 This extension provides an AIFirst Language Model Chat Provider that looks up prompts from JSON files in the `book_content` directory and returns the corresponding response code. The extension also includes a comprehensive UI for browsing book content, viewing examples, and copying prompts/responses. The provider is automatically installed and can be enabled for use in all VS Code contexts (inline chat, completion, chat, agent mode, etc.).
 

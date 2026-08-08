@@ -1,39 +1,29 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
+import type { Book, Chapter, Example, Section } from '@aifirst/content';
+import { getBookContent } from './bookContent';
 
-interface BookData {
-  title: string;
-  sections: Section[];
-}
-
-interface Section {
-  title: string;
-  chapters: Chapter[];
-}
-
-interface Chapter {
-  title: string;
-  goal: string;
-  examples: Example[];
-}
-
-interface Example {
+/**
+ * The shape `AIBookWebViewProvider` renders: an example flattened to a uniform
+ * list of prompt/response pairs. The package models the same thing as `steps`,
+ * so the two are bridged here rather than in the webview, which is untouched.
+ */
+interface WebViewExample {
   title: string;
   description: string;
-  prompts: Prompt[];
+  prompts: { prompt: string; response: string }[];
 }
 
-interface Prompt {
-  prompt: string;
-  response: string;
+function toWebViewExample(example: Example): WebViewExample {
+  return {
+    title: example.title,
+    description: example.description ?? '',
+    prompts: example.steps.map(step => ({ prompt: step.prompt, response: step.response }))
+  };
 }
 
 export class AIBookProvider implements vscode.TreeDataProvider<BookItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<BookItem | undefined | null | void> = new vscode.EventEmitter<BookItem | undefined | null | void>();
   readonly onDidChangeTreeData: vscode.Event<BookItem | undefined | null | void> = this._onDidChangeTreeData.event;
-
-  constructor(private context: vscode.ExtensionContext) {}
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -49,7 +39,7 @@ export class AIBookProvider implements vscode.TreeDataProvider<BookItem> {
       return Promise.resolve(this.getBooks());
     } else if (element.contextValue === 'book') {
       // Return sections for this book
-      return Promise.resolve(this.getSections(element.data as BookData));
+      return Promise.resolve(this.getSections(element.data as Book));
     } else if (element.contextValue === 'section') {
       // Return chapters for this section
       return Promise.resolve(this.getChapters(element.data as Section));
@@ -61,91 +51,20 @@ export class AIBookProvider implements vscode.TreeDataProvider<BookItem> {
   }
 
   private getBooks(): BookItem[] {
-    const books: BookItem[] = [];
-    const extensionPath = this.context.extensionPath;
-    
-    if (!extensionPath) {
-      console.error('No extension path found');
-      return books;
-    }
-
-    const bookContentPath = path.join(extensionPath, 'book_content');
-    
-    if (!fs.existsSync(bookContentPath)) {
-      console.error('Book content path does not exist:', bookContentPath);
-      return books;
-    }
-
-    const files = fs.readdirSync(bookContentPath).filter(file => file.endsWith('.json'));
-    
-    for (const file of files) {
-      try {
-        const filePath = path.join(bookContentPath, file);
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const rawBookData = JSON.parse(fileContent);
-        const bookData: BookData = this.transformBookData(rawBookData);
-        
-        const bookItem = new BookItem(
-          bookData.title,
-          vscode.TreeItemCollapsibleState.Collapsed,
-          'book',
-          bookData
-        );
-        bookItem.iconPath = new vscode.ThemeIcon('book');
-        bookItem.tooltip = `${bookData.title} - ${bookData.sections.length} sections`;
-        books.push(bookItem);
-      } catch (error) {
-        console.error(`Error loading book file ${file}:`, error);
-      }
-    }
-
-    return books;
+    return getBookContent().books.map(book => {
+      const bookItem = new BookItem(
+        book.title,
+        vscode.TreeItemCollapsibleState.Collapsed,
+        'book',
+        book
+      );
+      bookItem.iconPath = new vscode.ThemeIcon('book');
+      bookItem.tooltip = `${book.title} - ${book.sections.length} sections`;
+      return bookItem;
+    });
   }
 
-  private transformBookData(rawData: any): BookData {
-    return {
-      ...rawData,
-      sections: rawData.sections.map((section: any) => ({
-        ...section,
-        chapters: section.chapters.map((chapter: any) => ({
-          ...chapter,
-          examples: chapter.examples.map((example: any) => {
-            // Transform example to ensure it has prompts array
-            if (example.prompts) {
-              // Already has prompts array - normalize responses
-              return {
-                title: example.title,
-                description: example.description,
-                prompts: example.prompts.map((p: any) => ({
-                  prompt: p.prompt,
-                  response: Array.isArray(p.response) ? p.response.join('\n') : p.response
-                }))
-              };
-            } else if (example.prompt && example.response) {
-              // Single prompt case - convert to prompts array
-              return {
-                title: example.title,
-                description: example.description,
-                prompts: [{
-                  prompt: example.prompt,
-                  response: Array.isArray(example.response) ? example.response.join('\n') : example.response
-                }]
-              };
-            } else {
-              // Fallback - empty prompts array
-              return {
-                title: example.title,
-                description: example.description || '',
-                prompts: []
-              };
-            }
-          })
-        }))
-      }))
-    };
-  }
-
-  private getSections(bookData: BookData): BookItem[] {
+  private getSections(bookData: Book): BookItem[] {
     return bookData.sections.map(section => {
       const sectionItem = new BookItem(
         section.title,
@@ -187,7 +106,7 @@ export class AIBookProvider implements vscode.TreeDataProvider<BookItem> {
       exampleItem.command = {
         command: 'ai-first-programming.showExample',
         title: 'Show Example',
-        arguments: [example]
+        arguments: [toWebViewExample(example)]
       };
       return exampleItem;
     });
@@ -199,7 +118,7 @@ class BookItem extends vscode.TreeItem {
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly contextValue: string,
-    public readonly data: any
+    public readonly data: unknown
   ) {
     super(label, collapsibleState);
   }

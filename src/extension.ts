@@ -5,13 +5,13 @@ import { AIFirstLanguageModelProvider } from './AIFirstLanguageModelProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	const aiBookProvider = new AIBookProvider(context);
+	const aiBookProvider = new AIBookProvider();
 	vscode.window.registerTreeDataProvider('aiFirstBooks', aiBookProvider);
 	console.log('AI First Programming: debug - extension activated', { extensionPath: context.extensionPath });
 
 	// Register AI First Language Model Chat Provider
 	if (vscode.lm) {
-		const aiFirstProvider = new AIFirstLanguageModelProvider(context.extensionPath);
+		const aiFirstProvider = new AIFirstLanguageModelProvider();
 		const languageModelDisposable = vscode.lm.registerLanguageModelChatProvider('ai-first', aiFirstProvider);
 		context.subscriptions.push(languageModelDisposable);
 		console.log('AI First Programming: Language Model Chat Provider registered');

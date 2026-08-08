@@ -1,21 +1,12 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-
-interface PromptEntry {
-	prompt: string;
-	response: string;
-	// Optional language id e.g. 'python', 'java' to allow language-scoped matching
-	language?: string;
-}
+import { findMatch, unwrapPromptTag, type Step } from '@aifirst/content';
+import { getBookContent } from './bookContent';
 
 export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatProvider {
-	private extensionPath: string;
-	private promptIndex: PromptEntry[] = [];
+	private promptIndex: readonly Step[] = [];
 	private indexLoaded: boolean = false;
 
-	constructor(extensionPath: string) {
-		this.extensionPath = extensionPath;
+	constructor() {
 		this.loadPromptsFromBooks();
 	}
 
@@ -48,7 +39,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 	): Promise<void> {
 		// Ensure prompts are loaded
 		if (!this.indexLoaded) {
-			await this.loadPromptsFromBooks();
+			this.loadPromptsFromBooks();
 		}
 
 		// Determine the active editor language (if any) so we can restrict matching
@@ -66,8 +57,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		const rawUserPrompt = this.extractTextFromMessage(userMessage);
 		// Inline chat / agent mode wraps the user's actual query in <prompt>...</prompt>.
 		// Extract just the inner text so fuzzy matching sees the real prompt.
-		const promptTagMatch = rawUserPrompt.match(/<prompt>([\s\S]*?)<\/prompt>/i);
-		const userPrompt = promptTagMatch ? promptTagMatch[1].trim() : rawUserPrompt;
+		const userPrompt = unwrapPromptTag(rawUserPrompt);
 
 		if (!userPrompt) {
 			this.reportSafely(progress, new vscode.LanguageModelTextPart('Could not extract text from user message.'));
@@ -188,151 +178,23 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		return '';
 	}
 
-	private async loadPromptsFromBooks(): Promise<void> {
-		try {
-			this.promptIndex = [];
-			const bookContentPath = path.join(this.extensionPath, 'book_content');
-
-			if (!fs.existsSync(bookContentPath)) {
-				console.warn('AI First Programming: book_content directory not found:', bookContentPath);
-				this.indexLoaded = true;
-				return;
-			}
-
-			const files = fs.readdirSync(bookContentPath).filter(file => file.endsWith('.json'));
-
-			for (const file of files) {
-				try {
-					const filePath = path.join(bookContentPath, file);
-					const fileContent = fs.readFileSync(filePath, 'utf8');
-					const bookData = JSON.parse(fileContent);
-
-					// Derive language from filename when possible (e.g. 'python' or 'java')
-					const lowerName = file.toLowerCase();
-					let fileLanguage: string | undefined = undefined;
-					if (lowerName.includes('python')) {
-						fileLanguage = 'python';
-					} else if (lowerName.includes('java')) {
-						fileLanguage = 'java';
-					}
-
-					// Extract prompts from the book structure
-					if (bookData.sections && Array.isArray(bookData.sections)) {
-						for (const section of bookData.sections) {
-							if (section.chapters && Array.isArray(section.chapters)) {
-								for (const chapter of section.chapters) {
-									if (chapter.examples && Array.isArray(chapter.examples)) {
-										for (const example of chapter.examples) {
-											// Handle single prompt/response
-											if (example.prompt && example.response) {
-												const response = Array.isArray(example.response)
-													? example.response.join('\n')
-													: example.response;
-												this.promptIndex.push({
-													prompt: example.prompt,
-													response: response,
-													language: fileLanguage
-												});
-											}
-
-											// Handle multiple prompts array
-											if (example.prompts && Array.isArray(example.prompts)) {
-												for (const promptEntry of example.prompts) {
-													if (promptEntry.prompt && promptEntry.response) {
-														const response = Array.isArray(promptEntry.response)
-															? promptEntry.response.join('\n')
-															: promptEntry.response;
-														this.promptIndex.push({
-															prompt: promptEntry.prompt,
-															response: response,
-															language: fileLanguage
-														});
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				} catch (error) {
-					console.error(`AI First Programming: Error loading book file ${file}:`, error);
-				}
-			}
-
-			console.log(`AI First Programming: Loaded ${this.promptIndex.length} prompts from book content`);
-			this.indexLoaded = true;
-		} catch (error) {
-			console.error('AI First Programming: Error loading prompts:', error);
-			this.indexLoaded = true;
-		}
+	private loadPromptsFromBooks(): void {
+		this.promptIndex = getBookContent().steps;
+		this.indexLoaded = true;
 	}
 
-	private findMatchingPrompt(userPrompt: string, language?: string): PromptEntry | null {
-		if (this.promptIndex.length === 0) {
-			return null;
-		}
-
-		// If a language is provided, restrict strictly to entries with that language.
-		if (language && language !== 'plaintext') {
-			const entries = this.promptIndex.filter(entry => entry.language === language);
-			if (entries.length === 0) {
-				return null;
-			}
-			return this.searchEntries(userPrompt, entries);
-		}
-
-		// Plaintext / unknown (e.g. Untitled-1): tiered search — exhaust Python entries entirely
-		// (exact → partial → fuzzy) before falling through to Java, then anything else. This
-		// avoids the Java entry winning just because it has an extra matching word.
-		const python = this.promptIndex.filter(e => e.language === 'python');
-		const java = this.promptIndex.filter(e => e.language === 'java');
-		const other = this.promptIndex.filter(e => e.language !== 'python' && e.language !== 'java');
-		for (const group of [python, java, other]) {
-			if (group.length === 0) { continue; }
-			const m = this.searchEntries(userPrompt, group);
-			if (m) { return m; }
-		}
-		return null;
-	}
-
-	private searchEntries(userPrompt: string, entries: PromptEntry[]): PromptEntry | null {
-		const normalizedUserPrompt = userPrompt.toLowerCase().trim();
-
-		// 1. Exact match (case-insensitive)
-		for (const entry of entries) {
-			if (entry.prompt.toLowerCase().trim() === normalizedUserPrompt) {
-				return entry;
-			}
-		}
-
-		// 2. Partial match (user prompt contains stored prompt or vice versa)
-		for (const entry of entries) {
-			const normalizedStoredPrompt = entry.prompt.toLowerCase().trim();
-			if (normalizedUserPrompt.includes(normalizedStoredPrompt) ||
-				normalizedStoredPrompt.includes(normalizedUserPrompt)) {
-				return entry;
-			}
-		}
-
-		// 3. Fuzzy match (simple word-based similarity)
-		let bestMatch: PromptEntry | null = null;
-		let bestScore = 0;
-		const userWords = normalizedUserPrompt.split(/\s+/).filter(w => w.length > 2);
-
-		for (const entry of entries) {
-			const storedWords = entry.prompt.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-			const commonWords = userWords.filter(word => storedWords.includes(word));
-			const score = commonWords.length / Math.max(userWords.length, storedWords.length);
-
-			if (score > bestScore && score > 0.5) {
-				bestScore = score;
-				bestMatch = entry;
-			}
-		}
-
-		return bestMatch;
+	/**
+	 * Resolve a prompt to the code the book prints for it.
+	 *
+	 * The matching itself lives in `@aifirst/content` so this extension and the
+	 * `aifirst` CLI resolve a reader's prompt through exactly the same code path.
+	 * Deliberately no fourth argument: `findMatch`'s default preference order is
+	 * this extension's long-standing python → java → other fallthrough for an
+	 * unknown language. The CLI passes the reader's chosen book instead; passing
+	 * anything here would change which code a reader is shown.
+	 */
+	private findMatchingPrompt(userPrompt: string, language?: string): Step | null {
+		return findMatch(userPrompt, this.promptIndex, language);
 	}
 
 	private splitIntoChunks(text: string, chunkSize: number = 50): string[] {

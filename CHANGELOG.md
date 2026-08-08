@@ -5,6 +5,15 @@ All notable changes to the "AI First Programming" extension will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-08-08
+
+### Changed
+- Book content and prompt matching now come from the shared [`@aifirst/content`](https://github.com/aifirstprogramming/aifirstcontent) package instead of a copy inlined in this extension. The `aifirst` CLI already consumes the same package, so a prompt printed in the book resolves to the same code in the terminal and in VS Code — one implementation, two surfaces.
+- **No behaviour change is intended.** The shared matcher was originally lifted verbatim from this extension. A golden regression test (`npm run test:unit`) replays 1,480 recorded cases — every authored prompt across every language scope, plus case, whitespace, `<prompt>`-tag and fuzzy variants — against the pre-migration results and requires them to be identical.
+
+### Removed
+- The bundled `book_content/` directory. The content repository is now the single source of truth; the books ship via the package's `books/*.json` subpath export.
+
 ## [1.4.0] - 2026-05-17
 
 ### Changed
