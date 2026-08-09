@@ -52,14 +52,14 @@ jobs:
           set -o pipefail
           node scripts/sync-content.ts --tag "${{ steps.tag.outputs.tag }}" --accept-content-changes \
             | tee sync-output.log
-          grep '^DELTA_JSON:' sync-output.log | sed 's/^DELTA_JSON://' > delta.json
+          grep '^DELTA_JSON:' sync-output.log | sed 's/^DELTA_JSON://' > "$RUNNER_TEMP/delta.json"
           # Expose delta counts as step outputs for the commit/issue text below.
-          echo "old_count=$(jq -r .oldCount delta.json)" >> "$GITHUB_OUTPUT"
-          echo "new_count=$(jq -r .newCount delta.json)" >> "$GITHUB_OUTPUT"
-          echo "changed_count=$(jq -r '.changed | length' delta.json)" >> "$GITHUB_OUTPUT"
-          echo "retired_count=$(jq -r '.retired | length' delta.json)" >> "$GITHUB_OUTPUT"
-          echo "added_count=$(jq -r '.added | length' delta.json)" >> "$GITHUB_OUTPUT"
-          echo "carried_count=$(jq -r '.carried | length' delta.json)" >> "$GITHUB_OUTPUT"
+          echo "old_count=$(jq -r .oldCount "$RUNNER_TEMP/delta.json")" >> "$GITHUB_OUTPUT"
+          echo "new_count=$(jq -r .newCount "$RUNNER_TEMP/delta.json")" >> "$GITHUB_OUTPUT"
+          echo "changed_count=$(jq -r '.changed | length' "$RUNNER_TEMP/delta.json")" >> "$GITHUB_OUTPUT"
+          echo "retired_count=$(jq -r '.retired | length' "$RUNNER_TEMP/delta.json")" >> "$GITHUB_OUTPUT"
+          echo "added_count=$(jq -r '.added | length' "$RUNNER_TEMP/delta.json")" >> "$GITHUB_OUTPUT"
+          echo "carried_count=$(jq -r '.carried | length' "$RUNNER_TEMP/delta.json")" >> "$GITHUB_OUTPUT"
 
       - name: Compile
         run: npm run compile
@@ -101,9 +101,9 @@ jobs:
           DATE=$(date -u +%Y-%m-%d)
 
           # CHANGELOG entry naming every changed and retired prompt from delta.json.
-          CHANGED_LIST=$(jq -r '.changed[]? | "- Changed: \(.)"' delta.json)
-          RETIRED_LIST=$(jq -r '.retired[]? | "- Retired: \(.)"' delta.json)
-          ADDED_LIST=$(jq -r '.added[]? | "- Added: \(.)"' delta.json)
+          CHANGED_LIST=$(jq -r '.changed[]? | "- Changed: \(.)"' "$RUNNER_TEMP/delta.json")
+          RETIRED_LIST=$(jq -r '.retired[]? | "- Retired: \(.)"' "$RUNNER_TEMP/delta.json")
+          ADDED_LIST=$(jq -r '.added[]? | "- Added: \(.)"' "$RUNNER_TEMP/delta.json")
           {
             echo "## $NEW_VERSION - $DATE"
             echo
@@ -143,7 +143,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
 
-          RETIRED_TEXT=$(jq -r '.retired[]? | "- \(.)"' delta.json)
+          RETIRED_TEXT=$(jq -r '.retired[]? | "- \(.)"' "$RUNNER_TEMP/delta.json")
           {
             echo "Sync content to $TAG ($OLD_COUNT -> $NEW_COUNT prompts)"
             echo
@@ -166,15 +166,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          # Read delta.json if the sync step wrote one before failing; otherwise
+          # Read the delta scratch file if the sync step wrote one before failing; otherwise
           # report just the tag and workflow URL so oncall has a starting point.
           BODY="Content sync to $TAG failed. See the workflow run for the failing step: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          if [ -f delta.json ]; then
+          if [ -f "$RUNNER_TEMP/delta.json" ]; then
             BODY="$BODY
 
           Delta at failure time:
           \`\`\`
-          $(cat delta.json)
+          $(cat "$RUNNER_TEMP/delta.json")
           \`\`\`"
           fi
           gh issue create \

@@ -18,3 +18,7 @@ yarn-error.log
 
 # JetBrains
 .idea/
+
+# CI scratch from content-sync.yml (the workflow writes this to $RUNNER_TEMP now,
+# but keep it ignored as a backstop against a future regression).
+/delta.json
