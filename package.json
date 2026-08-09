@@ -2,7 +2,7 @@
   "name": "ai-first-programming",
   "displayName": "AI First Programming",
   "description": "A companion extension for the AI First Programming book series that provides easy access to book examples, prompts, and code responses. Includes a Language Model Chat Provider that returns exact code examples from the books.",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "publisher": "aifirstprogramming",
   "icon": "icon.png",
   "engines": {
@@ -148,6 +148,6 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@aifirst/content": "github:aifirstprogramming/aifirstcontent#v1.1.1"
+    "@aifirst/content": "github:aifirstprogramming/aifirstcontent#v1.4.0"
   }
 }

@@ -22,7 +22,7 @@ suite('Extension Test Suite', () => {
 	test('book content loads inside the extension host', () => {
 		const content = getBookContent();
 		assert.strictEqual(content.books.length, 2, 'both books should load');
-		assert.strictEqual(content.steps.length, 48, 'all 48 prompts should load');
+		assert.strictEqual(content.steps.length, 148, 'all 48 prompts should load');
 		assert.ok(content.steps.every(step => step.response.length > 0), 'every prompt should have code');
 		assert.deepStrictEqual(
 			[...new Set(content.steps.map(step => step.language))].sort(),
