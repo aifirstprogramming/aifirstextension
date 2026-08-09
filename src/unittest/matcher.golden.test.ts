@@ -8,7 +8,7 @@
  * `matcher.golden.json` was captured from the OLD inlined matcher (commit
  * 9b47d76, v1.4.0) before that migration. This test replays every case through
  * the shared implementation and asserts nothing moved. If it fails, a reader is
- * being shown different code than before — treat that as a bug unless the change
+ * being shown different code than before. Treat that as a bug unless the change
  * was deliberate, in which case regenerate the fixture and say so in CHANGELOG.
  *
  * Runs under plain `node --test` (see `npm run test:unit`); it deliberately does
@@ -20,24 +20,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { findMatch, unwrapPromptTag, type Step } from '@aifirst/content';
 import { getBookContent } from '../bookContent';
+import { VARIANTS, scopes } from './golden.fixtures';
 import golden from './matcher.golden.json';
 
 const steps: readonly Step[] = getBookContent().steps;
 
-/** Must mirror the `VARIANTS` used to capture the fixture, exactly. */
-const VARIANTS: Record<number, (prompt: string) => string> = {
-	0: p => p,
-	1: p => p.toUpperCase(),
-	2: p => `   ${p}\n `,
-	3: p => `<prompt>${p}</prompt>`,
-	4: p => p.split(/\s+/).slice(0, Math.ceil(p.split(/\s+/).length / 2)).join(' '),
-	5: p => `${p} please`,
-};
-
-const scopes: (string | undefined)[] = (golden.scopes as (string | null)[]).map(s => s ?? undefined);
 const sha256 = (value: string): string => createHash('sha256').update(value, 'utf8').digest('hex');
 
-/** Index of the matched step, or null — the identity the fixture records. */
+/** Index of the matched step, or null: the identity the fixture records. */
 function matchIndex(prompt: string, language: string | undefined): number | null {
 	// No fourth argument: findMatch's default preference is this extension's
 	// python -> java -> other fallthrough. Passing one changes what readers see.
