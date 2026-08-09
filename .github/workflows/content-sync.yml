@@ -172,10 +172,10 @@ jobs:
           if [ -f delta.json ]; then
             BODY="$BODY
 
-Delta at failure time:
-\`\`\`
-$(cat delta.json)
-\`\`\`"
+          Delta at failure time:
+          \`\`\`
+          $(cat delta.json)
+          \`\`\`"
           fi
           gh issue create \
             --title "Content sync to $TAG failed" \
