@@ -80,10 +80,17 @@ export function reconcile(
 	newSteps: readonly StepLike[],
 	opts: ReconcileOptions
 ): ReconcileResult {
-	const newByPrompt = new Map<string, StepLike>();
-	for (const step of newSteps) {
-		newByPrompt.set(step.prompt, step);
-	}
+	// Entries must come out in the SAME order as newSteps (pack order), not
+	// fixture order with additions tacked on at the end. matchIndex() in the
+	// golden test resolves a match via steps.indexOf(), a pack-order index,
+	// and compares it against fixture indices produced here. If added prompts
+	// landed at the tail instead of their true pack position, those two
+	// coordinate systems would only agree by coincidence (and did, until the
+	// first release that actually added prompts instead of just editing them).
+	const oldByPrompt = new Map<string, { entry: FixtureEntry; oldIdx: number }>();
+	fixture.entries.forEach((entry, oldIdx) => {
+		oldByPrompt.set(entry.prompt, { entry, oldIdx });
+	});
 
 	const carried: string[] = [];
 	const added: string[] = [];
@@ -93,54 +100,54 @@ export function reconcile(
 	// remap[oldIdx] = newIdx (missing key means the entry was retired).
 	const remap = new Map<number, number>();
 	const reconciledEntries: FixtureEntry[] = [];
+	const addedIndices: number[] = [];
+	const seenOldIndices = new Set<number>();
 
-	fixture.entries.forEach((entry, oldIdx) => {
-		const match = newByPrompt.get(entry.prompt);
-		if (!match) {
-			retired.push(entry.prompt);
+	newSteps.forEach((step, newIdx) => {
+		const existing = oldByPrompt.get(step.prompt);
+		if (!existing) {
+			addedIndices.push(newIdx);
+			reconciledEntries.push({
+				language: step.language,
+				prompt: step.prompt,
+				responseSha256: sha256(step.response),
+				responseLength: step.response.length,
+			});
+			added.push(step.prompt);
 			return;
 		}
 
-		const newSha = sha256(match.response);
-		const newLen = match.response.length;
-		const contentChanged = newSha !== entry.responseSha256 || newLen !== entry.responseLength;
+		seenOldIndices.add(existing.oldIdx);
+		const newSha = sha256(step.response);
+		const newLen = step.response.length;
+		const contentChanged = newSha !== existing.entry.responseSha256 || newLen !== existing.entry.responseLength;
 
 		if (contentChanged) {
 			if (!opts.acceptContentChanges) {
-				throw new ContentChangedError(entry.prompt);
+				throw new ContentChangedError(existing.entry.prompt);
 			}
-			remap.set(oldIdx, reconciledEntries.length);
+			remap.set(existing.oldIdx, newIdx);
 			reconciledEntries.push({
-				language: match.language,
-				prompt: entry.prompt,
+				language: step.language,
+				prompt: existing.entry.prompt,
 				responseSha256: newSha,
 				responseLength: newLen,
 			});
-			changed.push(entry.prompt);
+			changed.push(existing.entry.prompt);
 			return;
 		}
 
-		remap.set(oldIdx, reconciledEntries.length);
-		reconciledEntries.push(entry);
-		carried.push(entry.prompt);
+		remap.set(existing.oldIdx, newIdx);
+		reconciledEntries.push(existing.entry);
+		carried.push(existing.entry.prompt);
 	});
 
-	// New content steps whose prompt text is not already an entry become fresh entries.
-	const oldPromptSet = new Set(fixture.entries.map(e => e.prompt));
-	const addedIndices: number[] = [];
-	for (const step of newSteps) {
-		if (oldPromptSet.has(step.prompt)) {
-			continue;
+	// Any fixture entry never matched against newSteps went away upstream.
+	fixture.entries.forEach((entry, oldIdx) => {
+		if (!seenOldIndices.has(oldIdx)) {
+			retired.push(entry.prompt);
 		}
-		addedIndices.push(reconciledEntries.length);
-		reconciledEntries.push({
-			language: step.language,
-			prompt: step.prompt,
-			responseSha256: sha256(step.response),
-			responseLength: step.response.length,
-		});
-		added.push(step.prompt);
-	}
+	});
 
 	const reconciledCases: CaseTuple[] = [];
 	for (const tuple of fixture.cases) {
