@@ -27,6 +27,7 @@ absolute paths from the machine it ran on were replaced with `<scratch>/` and `~
 | [Migrate onto `@aifirst/content`](plans/2026-08-08-migrate-onto-aifirst-content.md) — retire the extension's own copy of the books and the matcher in favour of the package the CLI already uses, guarded by a 1,480-case golden regression test | 2026-08-08 | Shipped in 1.5.0 |
 | [`@aifirst` in the chat pane](plans/2026-08-09-chat-pane-unit-test-chapters.md) — file-creating exercises for the unit-test chapters, which need two files (the code under test and the test) and so cannot work in a scratch buffer | 2026-08-09 | **Proposed — not implemented** |
 | [Close the content-sync / publish loop](plans/2026-08-10-close-content-sync-publish-loop.md) — the sync bumped `package.json` and pushed, but never triggered `publish.yml`, so the Marketplace silently fell behind `main` | 2026-08-10 | Shipped |
+| [Fix updateCountLiteral idempotency](plans/2026-08-10-sync-content-idempotency.md): re-running a content sync at an already-correct count threw instead of no-op, because the pattern-not-found and already-correct cases were both detected as `raw === updated` | 2026-08-10 | Shipped |
 
 The chat-pane plan is a design that has not been built. It is here because the analysis behind it —
 which exercises need more than one file, and why a real model cannot produce the book's exact test

@@ -34,7 +34,7 @@ import {
 	type StepLike,
 	type MatchFn,
 } from '../src/sync/reconcile.ts';
-import { check, stripV } from '../src/sync/check.ts';
+import { check, stripV, updateCountLiteral } from '../src/sync/check.ts';
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const PACKAGE_JSON = path.join(REPO_ROOT, 'package.json');
@@ -115,15 +115,6 @@ function readInstalledVersion(): string {
 	return JSON.parse(raw).version;
 }
 
-function updateCountLiteral(newCount: number): void {
-	const raw = readFileSync(EXTENSION_TEST, 'utf8');
-	const updated = raw.replace(/(content\.steps\.length\s*,\s*)(\d+)/, `$1${newCount}`);
-	if (updated === raw) {
-		throw new Error(`Could not update count literal in ${EXTENSION_TEST}.`);
-	}
-	writeFileSync(EXTENSION_TEST, updated);
-}
-
 function runCheck(): void {
 	const result = check({ repoRoot: REPO_ROOT });
 	if (result.ok) {
@@ -172,7 +163,7 @@ function runSync(tag: string, accept: boolean): void {
 	const { fixture: reconciled, delta } = result;
 
 	writeFileSync(FIXTURE_PATH, JSON.stringify(reconciled, null, '\t') + '\n');
-	updateCountLiteral(reconciled.entries.length);
+	updateCountLiteral(EXTENSION_TEST, reconciled.entries.length);
 
 	console.log(`Content sync to ${tag}: ${fixture.entries.length} -> ${reconciled.entries.length} prompts.`);
 	console.log(`  carried:  ${delta.carried.length}`);

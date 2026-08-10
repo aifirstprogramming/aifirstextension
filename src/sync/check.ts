@@ -10,7 +10,7 @@
  * of "package.json says v1.1.1 but node_modules is still v1.1.0" false passes.
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import * as path from 'node:path';
 
 const CONTENT_DEP = '@aifirst/content';
@@ -99,6 +99,25 @@ export function readFixtureCount(fixturePath: string): number {
 /** Strip the leading v from a tag so it can be compared to a semver version. */
 export function stripV(tag: string): string {
 	return tag.startsWith('v') ? tag.slice(1) : tag;
+}
+
+const COUNT_REPLACE_RE = /(content\.steps\.length\s*,\s*)(\d+)/;
+
+/**
+ * Write newCount into the extension.test.ts count literal. A missing pattern
+ * always throws; a pattern already equal to newCount is a no-op, not a throw,
+ * so re-running a sync at an unchanged count stays quiet.
+ */
+export function updateCountLiteral(extensionTestPath: string, newCount: number): void {
+	const raw = readFileSync(extensionTestPath, 'utf8');
+	const match = raw.match(COUNT_REPLACE_RE);
+	if (!match) {
+		throw new Error(`Could not find count literal in ${extensionTestPath}.`);
+	}
+	if (Number(match[2]) === newCount) {
+		return;
+	}
+	writeFileSync(extensionTestPath, raw.replace(COUNT_REPLACE_RE, `$1${newCount}`));
 }
 
 export function check(paths: CheckPaths): CheckResult {

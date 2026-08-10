@@ -9,7 +9,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { test } from 'node:test';
@@ -21,7 +21,7 @@ import {
 	type Fixture,
 	type StepLike,
 } from '../sync/reconcile';
-import { check, readCountLiteral, readFixtureCount, readInstalledVersion, readPinTag, stripV } from '../sync/check';
+import { check, readCountLiteral, readFixtureCount, readInstalledVersion, readPinTag, stripV, updateCountLiteral } from '../sync/check';
 
 function makeFixture(entries: { language: string; prompt: string; response: string }[], extras: Partial<Fixture> = {}): Fixture {
 	return {
@@ -266,4 +266,57 @@ test('check against the current worktree passes (sanity: matches whatever is ins
 	// does not expose.
 	const result = check({ repoRoot: process.cwd() });
 	assert.equal(result.ok, true, `expected ok, got: ${JSON.stringify(result)}`);
+});
+
+// updateCountLiteral: a re-run at an unchanged count must be a no-op, not a
+// throw. The three cases below keep that boundary from collapsing back into
+// a single raw === updated string comparison.
+
+function stageExtensionTest(literal: string): { root: string; file: string } {
+	const root = mkdtempSync(path.join(tmpdir(), 'sync-update-count-'));
+	const file = path.join(root, 'extension.test.ts');
+	writeFileSync(file, literal);
+	return { root, file };
+}
+
+test('updateCountLiteral is a no-op when the literal already matches the requested count', () => {
+	const { root, file } = stageExtensionTest("assert.equal(content.steps.length, 148, 'ok');");
+	try {
+		const before = readFileSync(file, 'utf8');
+		assert.doesNotThrow(() => updateCountLiteral(file, 148));
+		assert.equal(readFileSync(file, 'utf8'), before);
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
+});
+
+test('updateCountLiteral rewrites the literal when the count genuinely changes', () => {
+	const { root, file } = stageExtensionTest("assert.equal(content.steps.length, 148, 'ok');");
+	try {
+		updateCountLiteral(file, 151);
+		assert.match(readFileSync(file, 'utf8'), /content\.steps\.length, 151/);
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
+});
+
+test('updateCountLiteral throws when the count-literal pattern is not found', () => {
+	const { root, file } = stageExtensionTest("assert.equal(renamedSteps.length, 148, 'ok');");
+	try {
+		assert.throws(() => updateCountLiteral(file, 148), /Could not find count literal/);
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
+});
+
+test('updateCountLiteral distinguishes no-match from already-correct at the boundary', () => {
+	const absent = stageExtensionTest("assert.equal(renamedSteps.length, 148, 'ok');");
+	const present = stageExtensionTest("assert.equal(content.steps.length, 148, 'ok');");
+	try {
+		assert.throws(() => updateCountLiteral(absent.file, 148), /Could not find count literal/);
+		assert.doesNotThrow(() => updateCountLiteral(present.file, 148));
+	} finally {
+		rmSync(absent.root, { recursive: true, force: true });
+		rmSync(present.root, { recursive: true, force: true });
+	}
 });
