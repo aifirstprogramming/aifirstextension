@@ -16,6 +16,8 @@ jobs:
     permissions:
       contents: write
       issues: write
+      # Needed for the final step to dispatch publish.yml via the GitHub API.
+      actions: write
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -80,6 +82,7 @@ jobs:
         run: xvfb-run -a npm test
 
       - name: Bump extension version, write CHANGELOG and plan, commit and push
+        id: commit
         if: success()
         env:
           TAG: ${{ steps.tag.outputs.tag }}
@@ -159,6 +162,26 @@ jobs:
           git commit -F commit-message.txt
           rm commit-message.txt
           git push origin main
+          echo "published_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      # The sync commit bumps package.json but publishing is a separate workflow.
+      # A tag pushed with GITHUB_TOKEN cannot trigger publish.yml (GitHub suppresses
+      # workflow triggers from the default token to prevent recursion), and this repo
+      # has no PAT that could push a triggering tag. So invoke publish.yml directly
+      # with the version the bump just produced. Without this the marketplace silently
+      # stays behind main -- exactly how v1.6.0 became stranded on 2026-08-09.
+      - name: Publish the bumped version to the Marketplace
+        if: steps.commit.outputs.published_version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.commit.outputs.published_version }}
+        run: |
+          set -euo pipefail
+          echo "Dispatching publish.yml for $VERSION"
+          gh workflow run publish.yml \
+            --repo "${{ github.repository }}" \
+            --ref main \
+            -f version="$VERSION"
 
       - name: Open failure issue
         if: failure()

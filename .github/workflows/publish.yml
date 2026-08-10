@@ -10,11 +10,7 @@ on:
         description: 'Version to publish (patch, minor, major, or specific version)'
         required: true
         default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
+        type: string
 
 jobs:
   publish:
