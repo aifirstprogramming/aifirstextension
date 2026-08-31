@@ -147,7 +147,12 @@ This extension is created by the authors of the AI First Programming book series
 
 ## License
 
-See the [LICENSE](LICENSE) file for details.
+The extension source, documentation, generated artifacts, and distributable
+examples are released under the [Apache License 2.0](LICENSE). See
+[NOTICE](NOTICE) for attribution.
+
+The license does not grant rights to the AI First names or logos. See
+[TRADEMARKS.md](TRADEMARKS.md).
 
 ---
 
