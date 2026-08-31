@@ -1,3 +1,15 @@
+## 1.7.0 - 2026-08-31
+
+Sync content to v1.5.0 (148 -> 155 prompts). 148 carried, 0 changed, 7 added, 0 retired.
+
+- Added: Make a game about a baby duckling who is trying to find its mother using pygame.
+- Added: The game currently has no enemies. Add a fox to the game.
+- Added: Make two more levels for the game. Each level should get harder with more obstacles and enemies.
+- Added: Design a level editor for the savetheduckling game.
+- Added: wouldn't it be cleaner to also have a matching save_level_def in the LevelDef class?
+- Added: Implement undo/redo for the level editor.
+- Added: Create a path finding algorithm for the level editor to test if a level is beatable. Make it animated.
+
 ## 1.6.0 - 2026-08-09
 
 Sync content to v1.4.0 (48 -> 148 prompts). 29 carried, 8 changed, 111 added, 11 retired.
