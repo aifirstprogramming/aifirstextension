@@ -1,3 +1,16 @@
+## 1.8.0 - 2026-09-02
+
+Sync content to v1.7.0 (155 -> 160 prompts). 153 carried, 1 changed, 6 added, 1 retired.
+
+- Changed: Design a level editor for the savetheduckling game.
+- Retired: wouldn't it be cleaner to also have a matching save_level_def in the LevelDef class?
+- Added: I want to build a personal finance application that is custom to my needs because others are missing features I'd really like to have. Zero-based budgeting tools assign each dollar a task, but I cannot easily see how much is leftover from income-expenses. They also don't seem to have good ways to divert leftover funds from one category to another. Spreadsheet templates are transaction-heavy and don't feel detailed enough on category spending or high-level analysis. I prefer to understand where money is going, where to move leftovers, and how to adjust (awareness budgeting). The app shouldn't be reactive, though. I want to make informed decisions on where to cut back, refocus/align spending to priorities, and understand my lifestyle.
+- Added: I'd like to be able to update or delete categories, transactions, savings goals, and obligations. Could we add that?
+- Added: I want to be able to load a CSV of transactions. The file format changes a bit, depending on vendor. Common fields include Date/Transaction Date,Description,Category,Amount/Debit/Credit. Handle errors gracefully.
+- Added: Could you create a sample .csv file for us to test loading into the application?
+- Added: The application should be able to handle and navigate multiple months that can roll up into a year-to-date, as well. Could we add that to the application?
+- Added: I want to be able to prioritize spending categories and have the application analyze actual spending against the prioritized categories to see where they match or are misaligned. There should be two separate lists. The first should be ordered category priorities (number and category name), and the second should be ordered categories by actual spending (number, category name, actual spend amount).
+
 ## 1.7.0 - 2026-08-31
 
 Sync content to v1.5.0 (148 -> 155 prompts). 148 carried, 0 changed, 7 added, 0 retired.
