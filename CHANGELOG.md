@@ -1,3 +1,10 @@
+## 1.9.0 - 2026-09-09
+
+Sync content to v1.8.0 (160 -> 162 prompts). 160 carried, 0 changed, 2 added, 0 retired.
+
+- Added: We would like to add a text-based trend visualization for each category for the last 3 months. This will help the user see when one category increases or decreases continuously and help them make decisions on whether to adjust. We don't need fancy analysis, just a trend display for each of last 3 months for each category. Since there are several categories, perhaps we can select a few at a time to view, instead of everything in one visualization.
+- Added: We want a reallocation feature that allows users to see how a change could impact their budget and goals. A user should be able to specify a category to reduce spending, the amount of the reduction, and a savings goal or obligation to redirect that amount. The projection should show the old and new target in the reduced category, old and new allocation to the goal/obligation, and old with updated goal progress percentage.
+
 ## 1.8.0 - 2026-09-02
 
 Sync content to v1.7.0 (155 -> 160 prompts). 153 carried, 1 changed, 6 added, 1 retired.
