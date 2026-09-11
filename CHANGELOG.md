@@ -1,3 +1,10 @@
+## 1.10.0 - 2026-09-11
+
+Sync content to v1.9.0 (162 -> 164 prompts). 162 carried, 0 changed, 2 added, 0 retired.
+
+- Added: Create a new Maven project for the thermostat testing exercises using Java 17 and JUnit 5.
+- Added: Please use mockito to mock the TemperatureSensor and make code updates accordingly.
+
 ## 1.9.0 - 2026-09-09
 
 Sync content to v1.8.0 (160 -> 162 prompts). 160 carried, 0 changed, 2 added, 0 retired.
