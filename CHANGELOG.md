@@ -1,3 +1,9 @@
+## 1.11.0 - 2026-09-12
+
+Sync content to v2.0.0 (164 -> 163 prompts). 163 carried, 0 changed, 0 added, 1 retired.
+
+- Retired: Create a new Maven project for the thermostat testing exercises using Java 17 and JUnit 5.
+
 ## 1.10.0 - 2026-09-11
 
 Sync content to v1.9.0 (162 -> 164 prompts). 162 carried, 0 changed, 2 added, 0 retired.
