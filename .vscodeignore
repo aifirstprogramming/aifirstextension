@@ -11,3 +11,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+docs/**
+IMPLEMENTATION_PLAN.md
+PUBLICATION_PLAN.md

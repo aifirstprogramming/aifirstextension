@@ -7,7 +7,7 @@
   "publisher": "aifirstprogramming",
   "icon": "icon.png",
   "engines": {
-    "vscode": "^1.102.0"
+    "vscode": "^1.104.0"
   },
   "categories": [
     "Other"
@@ -46,6 +46,11 @@
         "title": "Show Example"
       },
       {
+        "command": "ai-first-programming.findExample",
+        "title": "Find Book Example…",
+        "category": "AI First"
+      },
+      {
         "command": "ai-first-programming.focus",
         "title": "Focus on AI First Books Panel"
       },
@@ -54,6 +59,36 @@
         "title": "Copy Manage Models Command"
       }
     ],
+    "configuration": {
+      "title": "AI First Programming",
+      "properties": {
+        "aiFirst.trace": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Log the shape of each request VS Code sends to the AI First chat model (message roles, part types, offered tools, tool mode, matched example) to the **AI First Programming** output channel. Never logs your prompt text or file contents. Useful when reporting a problem with the chat model."
+        },
+        "aiFirst.trace.captureFixtures": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "For extension maintainers testing compatibility only. Saves each full chat request, **including prompt text**, as JSON under the extension's global storage folder. Leave off."
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "ai-first-programming.findExample",
+        "key": "ctrl+alt+shift+b",
+        "mac": "cmd+alt+shift+b"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "ai-first-programming.findExample",
+          "group": "9_aifirst@1"
+        }
+      ]
+    },
     "views": {
       "ai-first-programming": [
         {
@@ -140,11 +175,11 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.19.41",
-    "@types/vscode": "^1.102.0",
+    "@types/vscode": "1.104.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.1.0",
     "eslint": "^9.25.1",
     "typescript": "^5.8.3"
   },

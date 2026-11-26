@@ -5,19 +5,22 @@ import { getBookContent } from './bookContent';
 /**
  * The shape `AIBookWebViewProvider` renders: an example flattened to a uniform
  * list of prompt/response pairs. The package models the same thing as `steps`,
- * so the two are bridged here rather than in the webview, which is untouched.
+ * so the two are bridged here. The step id lets the viewer's Insert button
+ * resolve the exact step.
  */
 interface WebViewExample {
   title: string;
   description: string;
-  prompts: { prompt: string; response: string }[];
+  language: string;
+  prompts: { id: string; prompt: string; response: string }[];
 }
 
 function toWebViewExample(example: Example): WebViewExample {
   return {
     title: example.title,
     description: example.description ?? '',
-    prompts: example.steps.map(step => ({ prompt: step.prompt, response: step.response }))
+    language: example.language,
+    prompts: example.steps.map(step => ({ id: step.id, prompt: step.prompt, response: step.response }))
   };
 }
 
