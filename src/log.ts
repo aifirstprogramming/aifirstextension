@@ -11,7 +11,7 @@ import { summarizeRequest } from './requestTrace';
  * kinds, offered tools and their schema keys, tool mode, matched step id). No
  * prompt text or file contents.
  *
- * `aiFirst.trace.captureFixtures` is for the compatibility test lab only: it
+ * `aiFirst.captureFixtures` is for the compatibility test lab only: it
  * writes full requests, prompt text included, to the extension's global storage
  * so they can become unit-test fixtures. It is not documented for readers.
  */
@@ -70,7 +70,7 @@ export async function captureFixture(
 	messages: readonly vscode.LanguageModelChatRequestMessage[],
 	options: vscode.ProvideLanguageModelChatResponseOptions
 ): Promise<void> {
-	if (!fixtureDir || !setting('trace.captureFixtures')) {
+	if (!fixtureDir || !setting('captureFixtures')) {
 		return;
 	}
 	const fixture = {

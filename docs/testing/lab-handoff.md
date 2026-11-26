@@ -12,6 +12,18 @@ The goal is to test the AI First extension against VS Code's Copilot harness bef
 - **Needs a person:** about 10 minutes, to sign in to GitHub once in the VM.
 - **Decided:** native chat is checked on Linux only, with no README caveat. A native-chat problem that appears only on Windows or macOS, beyond what CI covers, is treated as a VS Code issue, not ours.
 
+## The lab as built (2026-11-26)
+
+The lab admin built it as an LXC container rather than the VM specified below. VS Code, its sandbox and the keyring all work in the container.
+
+| Item | Value |
+|---|---|
+| Host | `copilot-lab` (CT330), `copilot-lab.browsecode.org`, VLAN 120 at 10.120.0.11, reached from codex-dev with the `copilot-lab` SSH alias as `root` |
+| Desktop | XFCE on TigerVNC `:1` (`lab-vnc.service`) as user `copilot`. The keyring is created with a blank password and auto-unlocked at session start, so a GitHub token stored there is **unencrypted on disk**. Use only the dedicated test account. |
+| Builds | `/opt/vscode/{1.104,1.142,1.148,insiders}`. Launchers `code-1.104`, `code-1.142`, `code-1.148`, `code-1.148-signedout` and `code-insiders` in `/usr/local/bin`, each with its own profile under `~copilot/.vscode-lab/<name>/` |
+| Helpers | `lab-run CMD` runs CMD as `copilot` inside the desktop session (its D-Bus, keyring and runtime directory). Launching VS Code from a root SSH shell without it fails. `lab-key ARGS` focuses and maximizes VS Code, then runs `xdotool ARGS`. `lab-palette "Command"` runs a Command Palette command. `lab-net cut [min] \| restore \| status` is the offline switch. |
+| Sign-in | Over VNC, open the **VS Code 1.142**, **1.148** and **insiders** desktop icons and sign in with the test account. Leave `code-1.148-signedout` and `code-1.104` signed out. |
+
 ## What runs where
 
 | Check | Where | Why |
@@ -86,7 +98,7 @@ If a sign-in expires during testing, I'll stop and ask you to sign in again. I w
 
 ## What I'll do once I have access
 
-1. Install the CI-built extension package into each copy, and turn on `aiFirst.trace` and `aiFirst.trace.captureFixtures`.
+1. Install the CI-built extension package into each copy, and turn on `aiFirst.trace` and `aiFirst.captureFixtures`.
 2. **Baseline** on 1.142 and 1.148. The same Java and Python book prompts, through:
    - the chat panel, inline chat (saved and untitled files) and the Agents window
    - the Local harness and the Copilot harness

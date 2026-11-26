@@ -21,7 +21,7 @@ Only these combinations are tested. Don't expand the matrix without a reason.
 |---|---|---|
 | 1.104.0 | Declared minimum | CI host tests (`--label min`), plus the core section by hand on each OS |
 | 1.142.0 | Diagnostic: Local harness is the default | Baseline trace capture only; not a release gate |
-| 1.148.0 (current Stable, confirmed 2026-11-25) | Native certification | Section A via CI on all 3 OSes; sections B and C in the Linux lab, signed out and signed in with Copilot Free, bridge off and on, Local vs Copilot harness while Local exists |
+| 1.148.0 `661626d` (current Stable, confirmed 2026-11-25) | Native certification | Section A via CI on all 3 OSes; sections B and C in the Linux lab, signed out and signed in with Copilot Free, bridge off and on, Local vs Copilot harness while Local exists |
 | Insiders | Early warning | Weekly CI canary; one native smoke run per release cycle on Linux |
 
 When a new Stable is certified, update `stable` in `.vscode-test.mjs` and this table together.
@@ -41,7 +41,7 @@ When a new Stable is certified, update `stable` in `.vscode-test.mjs` and this t
 ### Tracing
 
 - `aiFirst.trace: true` logs each chat request's shape to **Output → AI First Programming**: roles, part kinds, offered tool names and schema keys, tool mode, matched step id, and the path taken. No prompt text.
-- `aiFirst.trace.captureFixtures: true` (lab only) also writes the full request, prompt text included, as JSON under the extension's global storage `fixtures/` folder. Use only book prompts in empty or throwaway files. These files become unit-test fixtures for the provider hardening work.
+- `aiFirst.captureFixtures: true` (lab only) also writes the full request, prompt text included, as JSON under the extension's global storage `fixtures/` folder. Use only book prompts in empty or throwaway files. These files become unit-test fixtures for the provider hardening work.
 
 ### Run manifest
 
@@ -103,18 +103,22 @@ Fill in each answer with the build it was observed on.
 
 | # | Question | Answer | Observed on |
 |---|---|---|---|
-| 1 | Does native chat need GitHub sign-in under the Copilot harness? (The migration docs say to sign in; the Agents window docs allow BYOK signed out.) | | |
-| 2 | Does the bridge expose AI First in released Stable, and in which surfaces (chat panel, inline chat, Agents window)? | | |
-| 3 | Does inline chat go through the Agent Host, and does it force untitled files to be saved? | | |
-| 4 | Which edit tools, schemas and `toolMode` values does the Copilot harness send? What do accepted, rejected and failed tool results look like? | | |
-| 5 | How are prompts wrapped, and what parts does a message contain? | | |
-| 6 | Does the model selection persist across a reload and when a session is reopened? | | |
+| 1 | Does native chat need GitHub sign-in under the Copilot harness? (The migration docs say to sign in; the Agents window docs allow BYOK signed out.) | No, not for AI First. Signed out, the chat panel (Copilot and Local harness) and inline chat all reached AI First and returned the exact book code. With the bridge **off**, the Copilot harness hides AI First and a prompt fails with "Authentication is required to start a session." The Local harness still works signed out with the bridge off. | 1.148.0 Linux, signed out |
+| 2 | Does the bridge expose AI First in released Stable, and in which surfaces (chat panel, inline chat, Agents window)? | Yes. `chat.agentHost.byokModels.enabled` defaults to **true** in released builds (1.142.0, 1.148.0 and 1.149.0-insider). It is still tagged experimental, with `experiment: {mode: "startup"}`, so an experiment can turn it off. Chat panel: yes. Inline chat doesn't depend on it (see 3). Agents window: not yet tested. Screenshots 02 and 07 in [evidence/2026-11-26-linux-1.148-signedout](evidence/2026-11-26-linux-1.148-signedout). | 1.148.0 Linux, signed out |
+| 3 | Does inline chat go through the Agent Host, and does it force untitled files to be saved? | **No Agent Host.** Inline chat uses the old path: a short system prompt ("GitHub Copilot"), a single `replace_string_in_file` tool and no agent-host activity. In a **saved** file the book code appears as a diff with Keep/Undo; Keep writes the exact code. In an **untitled** file the edit opens a diff between `Untitled-1` and a new `Untitled-2`. Accepting it opens a **Save As** dialog. Cancelling leaves the code in `Untitled-2` (with an extra blank line from the provider's `\n` placeholder), and the reader's `Untitled-1` stays empty. Screenshots 03–06. | 1.148.0 Linux, signed out |
+| 4 | Which edit tools, schemas and `toolMode` values does the Copilot harness send? What do accepted, rejected and failed tool results look like? | **Copilot harness:** about 67 tools, including `edit` (`path`, `old_str`, `new_str`; only `path` required) and `create` (`path`, `file_text`). There is **no** `replace_string_in_file`, so the provider streams markdown. `toolMode` is auto. **Local harness:** the familiar tool set, including `replace_string_in_file`; `toolMode` auto. **Inline chat:** only `replace_string_in_file` (`filePath`, `oldString`, `newString`, all required); `toolMode` auto. After Keep in inline chat, no follow-up request arrives. The shapes of accepted, rejected and failed tool results are **not yet observed**: they need an agent-mode edit, which the Copilot harness doesn't offer us yet. | 1.148.0 Linux, signed out |
+| 5 | How are prompts wrapped, and what parts does a message contain? | Every message is a single text part, and the prompt is always in the last user message. **Copilot harness:** a system prompt (about 23.6k characters), a user message with the Copilot SDK's environment reminder, then `<current_datetime>…</current_datetime>` followed by a blank line and the prompt. An attached current file lengthens that last message. Later turns resend the earlier user and assistant messages. **Local harness:** `<context>…</context><reminderInstructions>…</reminderInstructions><userRequest>prompt</userRequest>`. **Inline chat:** `<file>…</file><file-cursor-context>…</file-cursor-context><reminder>…</reminder>` then `<prompt>prompt</prompt>`. The matcher found the right step under all three wrappers. Redacted fixtures are in the evidence folder. | 1.148.0 Linux, signed out |
+| 6 | Does the model selection persist across a reload and when a session is reopened? | Partly answered. After restarting VS Code, a new chat used AI First without reselecting it. Signed out, it was the only model available, so this needs re-checking when signed in. | 1.148.0 Linux, signed out |
 | 7 | Which build is current Stable? | 1.148.0 (update API, 2026-11-25) | update.code.visualstudio.com |
 
 ## Results
 
-One row per run. Mark combinations that aren't supported as **unsupported**, never as passing.
+Evidence for each run is under [`evidence/`](evidence/), one folder per run. One row per run. Mark combinations that aren't supported as **unsupported**, never as passing.
 
 | Date | OS | Build | Account | Harness | Bridge | Section | Result | Notes / evidence |
 |---|---|---|---|---|---|---|---|---|
-| | | | | | | | | |
+| 2026-11-26 | Ubuntu 24.04 (LXC) | 1.148.0 `661626d` | signed out | Copilot | on (default) | B1, B2, B3, B11 | pass: AI First is listed and selectable, and the chat panel returns the exact `py-2-08` code | Apply/Insert at Cursor not yet tried. Screenshots 01, 02 |
+| 2026-11-26 | Ubuntu 24.04 (LXC) | 1.148.0 `661626d` | signed out | Copilot | off | B2, B3 | AI First hidden; prompt requires sign-in | Screenshot 07 |
+| 2026-11-26 | Ubuntu 24.04 (LXC) | 1.148.0 `661626d` | signed out | Local | off | B3 | pass: exact code as markdown | Screenshot 09 |
+| 2026-11-26 | Ubuntu 24.04 (LXC) | 1.148.0 `661626d` | signed out | inline (no harness) | on | B4 | pass: the saved file got the exact code, with Keep/Undo | Screenshot 03 |
+| 2026-11-26 | Ubuntu 24.04 (LXC) | 1.148.0 `661626d` | signed out | inline (no harness) | on | B5 | **fail (UX)**: the untitled file forces Save As, and Cancel strands the code in `Untitled-2` | Phase 2: drop the untitled path and point to Find Book Example. Screenshots 04–06 |

@@ -1,0 +1,62 @@
+{
+  "capturedAt": "2026-11-26T19:27:22.962Z",
+  "vscodeVersion": "1.148.0",
+  "platform": "linux",
+  "toolMode": 1,
+  "tools": [
+    {
+      "name": "replace_string_in_file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "An absolute path to the file to edit."
+          },
+          "oldString": {
+            "type": "string",
+            "description": "The exact literal text to replace, preferably unescaped. For single replacements (default), include at least 3 lines of context BEFORE and AFTER the target text, matching whitespace and indentation precisely. For multiple replacements, specify expected_replacements parameter. If this string is not the exact literal text (i.e. you escaped it) or does not match exactly, the tool will fail."
+          },
+          "newString": {
+            "type": "string",
+            "description": "The exact literal text to replace `old_string` with, preferably unescaped. Provide the EXACT text. Ensure the resulting code is correct and idiomatic."
+          }
+        },
+        "required": [
+          "filePath",
+          "oldString",
+          "newString"
+        ]
+      }
+    }
+  ],
+  "messages": [
+    {
+      "role": 3,
+      "content": [
+        {
+          "kind": "text",
+          "value": "When asked for your name, you must respond with \"GitHub Copilot\". When asked about the model you are using, you must state that you are using AI First Programming.\nFollow the user's requirements carefully & to the letter.\nFollow Microsoft content policies.\nAvoid content that violates copyrights.\nIf you are asked to generate content that is harmful, hateful, racist, sexist, lewd, or violent, only respond with \"Sorry, I can't assist with that.\"\nKeep your answers short and impersonal.\n<instructions>\nYou are an AI coding assistant that is used for quick, inline code changes. Changes are scoped to a single file or to some selected code in that file. You can ONLY edit that file and must use a tool to make these edits.\nThe user is interested in code changes grounded in the user's prompt. So, focus on coding, no wordy explanations, and do not ask back for clarifications.\nMake all changes in a single invocation of the edit-tool (there is no tool calling loop).\nDo not make code changes that are not directly and logically related to the user's prompt. When you cannot make a code change, reply with just a few words.\n\n</instructions>\n"
+        }
+      ]
+    },
+    {
+      "role": 1,
+      "content": [
+        {
+          "kind": "text",
+          "value": "The filepath is `untitled:Untitled-2` and this is its content:\n<file>\n```python\n\n```\n</file>\n<file-cursor-context>\n```python\n$CURSOR$\n```\n</file-cursor-context>\n<reminder>\nMake changes or write new code anywhere in the file.\nDo not make code changes that are not directly and logically related to the user's prompt.\nONLY change the `untitled:Untitled-2` file, make all changes in a single invocation of the edit-tool, and change NO other file.\n</reminder>\n"
+        }
+      ]
+    },
+    {
+      "role": 1,
+      "content": [
+        {
+          "kind": "text",
+          "value": "<prompt>\nAsk for the user's name and print it\n</prompt>\n"
+        }
+      ]
+    }
+  ]
+}
