@@ -26,7 +26,7 @@ suite('Extension Test Suite', () => {
 	test('book content loads inside the extension host', () => {
 		const content = getBookContent();
 		assert.strictEqual(content.books.length, 2, 'both books should load');
-		assert.strictEqual(content.steps.length, 155, 'every prompt in the pinned content pack should load');
+		assert.strictEqual(content.steps.length, 163, 'every prompt in the pinned content pack should load');
 		assert.ok(content.steps.every(step => step.response.length > 0), 'every prompt should have code');
 		assert.deepStrictEqual(
 			[...new Set(content.steps.map(step => step.language))].sort(),

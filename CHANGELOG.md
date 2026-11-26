@@ -9,6 +9,38 @@ Groundwork for VS Code's move from the Local to the Copilot agent harness (the L
 - Changed: The Books panel and all commands register before the chat model, so a failure in the language model API can no longer disable them.
 - Changed: Minimum VS Code version is now 1.104, where the language model provider API became stable.
 - Changed: README no longer says Copilot Business/Enterprise can never work, or that the chat model is free of all AI usage.
+## 1.11.0 - 2026-09-12
+
+Sync content to v2.0.0 (164 -> 163 prompts). 163 carried, 0 changed, 0 added, 1 retired.
+
+- Retired: Create a new Maven project for the thermostat testing exercises using Java 17 and JUnit 5.
+
+## 1.10.0 - 2026-09-11
+
+Sync content to v1.9.0 (162 -> 164 prompts). 162 carried, 0 changed, 2 added, 0 retired.
+
+- Added: Create a new Maven project for the thermostat testing exercises using Java 17 and JUnit 5.
+- Added: Please use mockito to mock the TemperatureSensor and make code updates accordingly.
+
+## 1.9.0 - 2026-09-09
+
+Sync content to v1.8.0 (160 -> 162 prompts). 160 carried, 0 changed, 2 added, 0 retired.
+
+- Added: We would like to add a text-based trend visualization for each category for the last 3 months. This will help the user see when one category increases or decreases continuously and help them make decisions on whether to adjust. We don't need fancy analysis, just a trend display for each of last 3 months for each category. Since there are several categories, perhaps we can select a few at a time to view, instead of everything in one visualization.
+- Added: We want a reallocation feature that allows users to see how a change could impact their budget and goals. A user should be able to specify a category to reduce spending, the amount of the reduction, and a savings goal or obligation to redirect that amount. The projection should show the old and new target in the reduced category, old and new allocation to the goal/obligation, and old with updated goal progress percentage.
+
+## 1.8.0 - 2026-09-02
+
+Sync content to v1.7.0 (155 -> 160 prompts). 153 carried, 1 changed, 6 added, 1 retired.
+
+- Changed: Design a level editor for the savetheduckling game.
+- Retired: wouldn't it be cleaner to also have a matching save_level_def in the LevelDef class?
+- Added: I want to build a personal finance application that is custom to my needs because others are missing features I'd really like to have. Zero-based budgeting tools assign each dollar a task, but I cannot easily see how much is leftover from income-expenses. They also don't seem to have good ways to divert leftover funds from one category to another. Spreadsheet templates are transaction-heavy and don't feel detailed enough on category spending or high-level analysis. I prefer to understand where money is going, where to move leftovers, and how to adjust (awareness budgeting). The app shouldn't be reactive, though. I want to make informed decisions on where to cut back, refocus/align spending to priorities, and understand my lifestyle.
+- Added: I'd like to be able to update or delete categories, transactions, savings goals, and obligations. Could we add that?
+- Added: I want to be able to load a CSV of transactions. The file format changes a bit, depending on vendor. Common fields include Date/Transaction Date,Description,Category,Amount/Debit/Credit. Handle errors gracefully.
+- Added: Could you create a sample .csv file for us to test loading into the application?
+- Added: The application should be able to handle and navigate multiple months that can roll up into a year-to-date, as well. Could we add that to the application?
+- Added: I want to be able to prioritize spending categories and have the application analyze actual spending against the prioritized categories to see where they match or are misaligned. There should be two separate lists. The first should be ordered category priorities (number and category name), and the second should be ordered categories by actual spending (number, category name, actual spend amount).
 
 ## 1.7.0 - 2026-08-31
 
