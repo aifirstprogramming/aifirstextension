@@ -1,3 +1,15 @@
+## Unreleased
+
+Groundwork for VS Code's move from the Local to the Copilot agent harness (the Local harness is removed in February 2027).
+
+- Added: **AI First: Find Book Example…** (`Ctrl+Alt+Shift+B` / `Cmd+Alt+Shift+B`, also in the editor context menu). Paste a book prompt, preview the matched code, then Insert, Copy, or Open in New Editor. Needs no Copilot, sign-in, or network. Insert follows the file's line endings, can be undone, and refuses if the file changed after matching.
+- Added: **Insert into Editor** button on each response in the example viewer.
+- Added: `aiFirst.trace` setting and an "AI First Programming" output channel. Tracing logs the shape of chat requests (roles, part types, offered tools, tool mode), never prompt text or file contents.
+- Changed: Syntax highlighting in the example viewer is bundled (Prism 1.30.0) instead of loaded from a CDN, so the viewer works offline. The viewer now has a content security policy, and Copy runs through VS Code's clipboard.
+- Changed: The Books panel and all commands register before the chat model, so a failure in the language model API can no longer disable them.
+- Changed: Minimum VS Code version is now 1.104, where the language model provider API became stable.
+- Changed: README no longer says Copilot Business/Enterprise can never work, or that the chat model is free of all AI usage.
+
 ## 1.7.0 - 2026-08-31
 
 Sync content to v1.5.0 (148 -> 155 prompts). 148 carried, 0 changed, 7 added, 0 retired.

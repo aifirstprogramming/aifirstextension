@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { findMatch, unwrapPromptTag, type Step } from '@aifirst/content';
 import { getBookContent } from './bookContent';
+import { captureFixture, traceEvent, traceRequest } from './log';
+
+let requestCounter = 0;
 
 export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatProvider {
 	private promptIndex: readonly Step[] = [];
@@ -37,6 +40,11 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		progress: vscode.Progress<vscode.LanguageModelResponsePart>,
 		token: vscode.CancellationToken
 	): Promise<void> {
+		// Diagnostics only (aiFirst.trace / aiFirst.trace.captureFixtures); no behavior change.
+		const requestId = `${Date.now().toString(36)}-${++requestCounter}`;
+		traceRequest(requestId, messages, options);
+		await captureFixture(requestId, messages, options);
+
 		// Ensure prompts are loaded
 		if (!this.indexLoaded) {
 			this.loadPromptsFromBooks();
@@ -49,6 +57,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		// Get the user's message from the messages array
 		const userMessages = messages.filter(msg => msg.role === vscode.LanguageModelChatMessageRole.User);
 		if (userMessages.length === 0) {
+			traceEvent(requestId, 'no-user-message');
 			this.reportSafely(progress, new vscode.LanguageModelTextPart('No user message found in the request.'));
 			return;
 		}
@@ -60,6 +69,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		const userPrompt = unwrapPromptTag(rawUserPrompt);
 
 		if (!userPrompt) {
+			traceEvent(requestId, 'no-text');
 			this.reportSafely(progress, new vscode.LanguageModelTextPart('Could not extract text from user message.'));
 			return;
 		}
@@ -72,6 +82,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		// non-empty oldString — we insert a tiny newline placeholder first and pass
 		// doc.uri.toString() (e.g. "untitled:Untitled-1").
 		const editTool = options.tools?.find(t => t.name === 'replace_string_in_file');
+		traceEvent(requestId, 'match', { stepId: match?.id ?? null, editTool: editTool?.name ?? null, editorLanguage: editorLanguage ?? null });
 
 		if (match && editTool && activeEditor) {
 			const doc = activeEditor.document;
@@ -97,6 +108,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 					'replace_string_in_file',
 					{ filePath: doc.uri.fsPath, oldString, newString }
 				));
+				traceEvent(requestId, 'emit-tool-call', { target: 'file' });
 				return;
 			}
 
@@ -111,10 +123,12 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 				'replace_string_in_file',
 				{ filePath: doc.uri.toString(), oldString: placeholder, newString: match.response }
 			));
+			traceEvent(requestId, 'emit-tool-call', { target: 'untitled-or-empty' });
 			return;
 		}
 
 		// Chat-panel (no edit tool) path: stream as fenced markdown.
+		traceEvent(requestId, match ? 'stream-markdown' : 'no-match');
 		if (match) {
 			const fenceLang = match.language ?? editorLanguage ?? '';
 			const fenced = `\`\`\`${fenceLang}\n${match.response}\n\`\`\`\n`;

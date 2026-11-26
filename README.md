@@ -7,14 +7,15 @@ A companion extension for the AI First Programming book series that provides eas
 - **Book Content Browser**: Navigate through book content organized by book, section, chapter, and example in a convenient sidebar tree view
 - **Example Viewer**: View detailed prompts and code responses with syntax highlighting
 - **Copy Functionality**: Easily copy prompts and responses to use in your code editor
+- **Find Book Example**: Paste a prompt from the book and insert its exact code into your file, with no Copilot, sign-in, or network needed
 - **AI First Programming Model**: A custom language model that returns exact code examples from the books
 - **Language-Aware Matching**: Automatically matches prompts based on your active editor's programming language
-- **Zero Token Cost**: Use the AI First Programming model without consuming your Copilot token quota
+- **No AI Credits for Book Code**: Find Book Example never calls a model, and the AI First Programming model answers from the book instead of an AI service
 
 ## Requirements
 
-- Visual Studio Code version 1.102.0 or later
-- GitHub Copilot (Free or Pro plan) - Note: Enterprise licenses may not support the "Manage Models" feature
+- Visual Studio Code version 1.104.0 or later
+- Optional: GitHub Copilot (the Free plan works), only for using the AI First Programming model in VS Code's chat. The Books panel, the example viewer, and Find Book Example work without it.
 
 ## Installation
 
@@ -66,6 +67,19 @@ You can then use the prompt in either of two ways:
 
 > **Tip**: We recommend always trying the prompt first, but don't hesitate to use the book response if needed!
 
+Each response in the example view also has an **Insert into Editor** button, which puts the code into the last file you were editing after you confirm.
+
+### Finding a Book Example (no Copilot needed)
+
+This always works, whatever your Copilot setup, and doesn't use any AI credits:
+
+1. Open the file you want the code in (a new untitled file is fine) and place your cursor, or select code to replace
+2. Run **AI First: Find Book Example…** from the Command Palette, the editor's right-click menu, or with `Ctrl+Alt+Shift+B` (`Cmd+Alt+Shift+B` on Mac)
+3. Paste the prompt from the book and press Enter
+4. The matching book code opens beside your file. Choose **Insert** to add it at your cursor, **Copy**, or **Open in New Editor**
+
+Matching uses your file's language, so a Python file gets the Python book's code. Insert is a normal edit: `Ctrl+Z` / `Cmd+Z` undoes it. If the file changed after the example was matched, nothing is inserted and you'll be asked to run the command again.
+
 ## Enabling the AI First Programming Model
 
 The AI First Programming extension includes a custom language model that returns exact code examples from the books. This feature allows you to practice using AI features in VS Code without using your Copilot token quota.
@@ -110,12 +124,12 @@ This will bring up a pick list of available models.
 Once enabled and selected, all your prompts will return the exact code responses that match the book text. Benefits include:
 
 - ✅ **Exact book examples**: Get the same code as shown in the book
-- ✅ **No token costs**: Complete all book exercises without using your Copilot quota
+- ✅ **Book answers, not AI answers**: The AI First Programming model answers from the book rather than an AI service. VS Code may still use its own models for background tasks such as naming chats; use Find Book Example if you need a path that makes no AI calls at all
 - ✅ **Language-aware**: Automatically matches prompts based on your active editor's language
 - ✅ **Inline editing**: Use `Ctrl+I` / `Cmd+I` to insert book examples directly into your file with the native Keep/X diff review
 - ✅ **Practice mode**: Perfect for learning AI-assisted coding without worrying about limits
 
-> **Caution**: The AI First Programming model only works with individual GitHub plans like Free and Copilot Pro. If you have an enterprise GitHub license from your work, the "Manage Models…" menu item will be missing from the drop-down. To use the AI First Programming model, you will need to create a separate GitHub account and associate it with Copilot.
+> **Caution**: If your GitHub Copilot access comes from an employer (Copilot Business or Enterprise), your administrator's policies may hide models supplied by extensions, including this one. We have not tested those plans. Find Book Example works regardless of your Copilot plan.
 
 ## Getting Started Walkthrough
 
@@ -132,6 +146,7 @@ You can access this walkthrough anytime from the VS Code welcome page or by sear
 
 - **Open AI Prompt**: `Cmd+I` (Mac) / `Ctrl+I` (Windows/Linux)
 - **Model Selection**: `Cmd+Alt+.` (Mac) / `Ctrl+Alt+.` (Windows/Linux)
+- **Find Book Example**: `Cmd+Alt+Shift+B` (Mac) / `Ctrl+Alt+Shift+B` (Windows/Linux)
 - **Focus on AI First Books Panel**: Use the command `ai-first-programming.focus` or click the sidebar icon
 
 ## Support

@@ -13,7 +13,14 @@ on:
         type: string
 
 jobs:
+  # Nothing is published unless the full CI (unit, content gate, host tests on
+  # all three OSes against the minimum and certified Stable builds, packaging)
+  # passes on the commit being published.
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   publish:
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -27,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies

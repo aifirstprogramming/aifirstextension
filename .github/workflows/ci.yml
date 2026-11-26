@@ -4,9 +4,16 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Weekly canary: catches a VS Code release that breaks the extension even in
+  # weeks when nobody pushes.
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+  # publish.yml calls this so nothing is published without passing it.
+  workflow_call:
 
 jobs:
-  ci:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,9 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          # Node 22 supports running .ts files directly via type-stripping,
-          # which is what `node scripts/sync-content.ts --check` relies on.
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
@@ -35,11 +40,92 @@ jobs:
       - name: Content sync gate
         run: node scripts/sync-content.ts --check
 
+  # Extension-host tests on each OS. Labels are defined in .vscode-test.mjs:
+  #   min    - declared engines minimum (core features must work)
+  #   stable - pinned, certified Stable
+  # The weekly run swaps in floating Stable and Insiders. Insiders failures are
+  # reported but never fail the run: it is an early warning, not a gate.
+  host-tests:
+    needs: checks
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        label: ${{ github.event_name == 'schedule' && fromJSON('["latest","insiders"]') || fromJSON('["min","stable"]') }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.label == 'insiders' }}
+    name: host-tests (${{ matrix.os }}, ${{ matrix.label }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile
+        run: npm run compile
+
+      - name: Cache VS Code downloads
+        if: matrix.label == 'min' || matrix.label == 'stable'
+        uses: actions/cache@v4
+        with:
+          path: .vscode-test
+          key: vscode-${{ runner.os }}-${{ matrix.label }}-${{ hashFiles('.vscode-test.mjs') }}
+
       - name: Install xvfb
+        if: runner.os == 'Linux'
         # xvfb is present on the ubuntu-latest image today but is not part of
         # the setup-node action's contract; install it explicitly so a base
         # image change does not silently skip the extension host tests.
         run: sudo apt-get update && sudo apt-get install -y xvfb
 
+      - name: Extension host tests (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx vscode-test --label ${{ matrix.label }}
+
       - name: Extension host tests
-        run: xvfb-run -a npm test
+        if: runner.os != 'Linux'
+        run: npx vscode-test --label ${{ matrix.label }}
+
+  # Build the VSIX the way it is published and check that the files readers need
+  # are inside it, so a packaging mistake (a missing media file, the books not
+  # bundled) fails here instead of after publishing. Installing it into a clean
+  # profile is part of the lab acceptance checklist.
+  package:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package VSIX
+        run: npx --yes @vscode/vsce@3.6.0 package --out ai-first-programming.vsix
+
+      - name: Check VSIX contents
+        run: |
+          unzip -l ai-first-programming.vsix > contents.txt
+          for f in extension/out/extension.js extension/media/prism/prism-core.min.js extension/media/prism/LICENSE extension/node_modules/@aifirst/content/books/ai-first-python-programming.json extension/node_modules/@aifirst/content/books/ai-first-java-programming.json; do
+            grep -q "$f" contents.txt || { echo "missing from VSIX: $f"; exit 1; }
+          done
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-vsix
+          path: ai-first-programming.vsix
+          retention-days: 14
