@@ -142,10 +142,12 @@ suite('Extension Test Suite', () => {
 				{ tools: [EDIT_TOOL], toolMode: vscode.LanguageModelChatToolMode.Auto }
 			);
 			const { calls } = await collect(response);
+			// An empty file takes the platform's default line ending (CRLF on Windows).
+			const eol = editor.document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
 			assert.deepStrictEqual(calls.map(c => c.input), [{
 				filePath: editor.document.uri.fsPath,
 				oldString: '',
-				newString: `${step.response}\n`,
+				newString: `${step.response}\n`.replace(/\n/g, eol),
 			}]);
 		});
 
