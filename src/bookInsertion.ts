@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { findMatch, unwrapPromptTag, type Step } from '@aifirst/content';
 import { getBookContent } from './bookContent';
-import { describeStep, toDocumentEol } from './insertText';
+import { describeStep, endLine, toDocumentEol } from './insertText';
 import { log } from './log';
 
 /**
@@ -87,7 +87,8 @@ export async function applyInsertion(target: InsertionTarget, text: string): Pro
 	}
 	const eol = target.document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
 	const edit = new vscode.WorkspaceEdit();
-	edit.replace(target.document.uri, target.selection, toDocumentEol(text, eol));
+	const after = target.document.getText().slice(target.document.offsetAt(target.selection.end));
+	edit.replace(target.document.uri, target.selection, toDocumentEol(endLine(text, after), eol));
 	return (await vscode.workspace.applyEdit(edit)) ? 'applied' : 'failed';
 }
 

@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { classifyPart, summarizeRequest } from '../requestTrace';
-import { describeStep, toDocumentEol } from '../insertText';
+import { describeStep, endLine, toDocumentEol } from '../insertText';
 
 const SECRET = 'my private prompt about payroll.py';
 
@@ -85,4 +85,12 @@ test('a matched step is described with book, chapter and step position', () => {
 	assert.equal(describeStep({ index: 1, total: 1 }, example), 'AI First Python Programming, Chapter 3 › Fizz Buzz');
 	assert.equal(describeStep({ index: 2, total: 3 }, example), 'AI First Python Programming, Chapter 3 › Fizz Buzz (step 2 of 3)');
 	assert.equal(describeStep({ index: 1, total: 1 }, undefined), 'Book example');
+});
+
+test('inserted code ends its line unless the text after it already starts one', () => {
+	assert.equal(endLine('}', '// c1\n'), '}\n', 'text on the same line moves to the next line');
+	assert.equal(endLine('}', ''), '}\n', 'the file ends with a newline');
+	assert.equal(endLine('}', '\nnext'), '}');
+	assert.equal(endLine('}', '\r\nnext'), '}');
+	assert.equal(endLine('}\n', 'x'), '}\n');
 });
