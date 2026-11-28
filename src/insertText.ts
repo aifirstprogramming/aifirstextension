@@ -16,6 +16,21 @@ export function toDocumentEol(text: string, eol: '\n' | '\r\n'): string {
 	return eol === '\r\n' ? normalized.replace(/\n/g, '\r\n') : normalized;
 }
 
+/**
+ * End the inserted code's line.
+ *
+ * Book responses don't end with a newline. Inserted before other text on the
+ * same line, the next line would run into the code's last line (`}// c1`), and
+ * at the end of a file the file would end without a newline. Nothing is added
+ * when the code already ends a line or the text after it starts a new one.
+ */
+export function endLine(code: string, textAfter: string): string {
+	if (code.endsWith('\n') || textAfter.startsWith('\n') || textAfter.startsWith('\r\n')) {
+		return code;
+	}
+	return `${code}\n`;
+}
+
 /** Short, human-readable location of a matched step, e.g. "Chapter 3 › Fizz Buzz (step 2 of 3)". */
 export function describeStep(
 	step: { index: number; total: number },

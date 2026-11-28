@@ -13,6 +13,8 @@
  * result has `callId` and a `content` array.
  */
 
+import { endLine } from './insertText';
+
 interface Duck {
 	[key: string]: unknown;
 }
@@ -196,10 +198,7 @@ export function planEdit(editor: EditorSnapshot, response: string): EditInput | 
 	}
 	const before = editor.text.slice(0, editor.selectionStart);
 	const after = editor.text.slice(editor.selectionEnd);
-	let code = response.replace(/\r\n/g, '\n');
-	if (!code.endsWith('\n') && !after.startsWith('\n') && !after.startsWith('\r\n')) {
-		code += '\n';
-	}
+	let code = endLine(response.replace(/\r\n/g, '\n'), after);
 	if (editor.eol === '\r\n') {
 		code = code.replace(/\n/g, '\r\n');
 	}

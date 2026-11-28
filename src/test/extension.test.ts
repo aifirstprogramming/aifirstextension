@@ -211,6 +211,14 @@ suite('Extension Test Suite', () => {
 			assert.strictEqual(editor.document.getText(), '# start\n');
 		});
 
+		test('code inserted before text on the same line ends its own line', async () => {
+			const editor = await openUntitled('// c1\n');
+			editor.selection = new vscode.Selection(0, 0, 0, 0);
+			const target = captureTarget(editor)!;
+			assert.strictEqual(await applyInsertion(target, '}'), 'applied');
+			assert.strictEqual(editor.document.getText(), '}\n// c1\n');
+		});
+
 		test('replaces the captured selection', async () => {
 			const editor = await openUntitled('keep\nREPLACE ME\nkeep\n');
 			editor.selection = new vscode.Selection(1, 0, 1, 10);
