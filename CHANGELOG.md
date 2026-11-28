@@ -9,6 +9,12 @@ Groundwork for VS Code's move from the Local to the Copilot agent harness (the L
 - Changed: The Books panel and all commands register before the chat model, so a failure in the language model API can no longer disable them.
 - Changed: Minimum VS Code version is now 1.104, where the language model provider API became stable.
 - Changed: README no longer says Copilot Business/Enterprise can never work, or that the chat model is free of all AI usage.
+- Fixed: In agent chat, after the AI First model inserts a book example, the next turn no longer answers "Could not extract text from user message." It says the example was inserted (choose Keep or Undo), or that the edit was skipped or failed and how to insert it with Find Book Example. The edit is never repeated.
+- Fixed: Prompts wrapped by the Copilot harness (a leading date, attached-file notes after the prompt) and the Local harness are unwrapped before matching, so they hit the exact-match tier instead of matching inside the wrapper text.
+- Changed: The chat model no longer edits untitled files through chat (VS Code forced a Save As and could strand the code in a second untitled tab). It answers with the code and how to insert it with Find Book Example, which is also what the Copilot harness shows, since it offers no edit tool the model supports yet. Empty saved files are still edited, now without first inserting a placeholder line.
+- Changed: Inserted code ends its line, and edits replace the whole file text so a selection that appears twice is still unambiguous.
+- Changed: A request that requires a tool call but has no editable target now fails with a message pointing to Find Book Example. Cancelled requests and closed response streams stop streaming, and a closed stream is logged.
+- Changed: The model's tooltip and detail say it returns exact book examples and is not an AI model.
 ## 1.11.0 - 2026-09-12
 
 Sync content to v2.0.0 (164 -> 163 prompts). 163 carried, 0 changed, 0 added, 1 retired.

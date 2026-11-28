@@ -1,4 +1,6 @@
 import * as assert from 'assert';
+import * as os from 'os';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { findMatch } from '@aifirst/content';
 import { getBookContent } from '../bookContent';
@@ -69,6 +71,122 @@ suite('Extension Test Suite', () => {
 			text += chunk;
 		}
 		assert.strictEqual(text, `\`\`\`${step.language}\n${step.response}\n\`\`\`\n`);
+	});
+
+	// The chat model's request handling, driven through the public language
+	// model API with request shapes the lab captured from real builds
+	// (docs/testing/evidence/). The pure decisions are unit tested in
+	// src/unittest/provider-logic.test.ts; these check the VS Code wiring.
+	suite('Chat model requests', () => {
+		const PROMPT = "Ask for the user's name and print it";
+		const EDIT_TOOL: vscode.LanguageModelChatTool = {
+			name: 'replace_string_in_file',
+			description: 'Replace a string in a file',
+			inputSchema: {
+				type: 'object',
+				properties: { filePath: { type: 'string' }, oldString: { type: 'string' }, newString: { type: 'string' } },
+				required: ['filePath', 'oldString', 'newString'],
+			},
+		};
+
+		async function model() {
+			const [m] = await vscode.lm.selectChatModels({ vendor: 'ai-first' });
+			return m;
+		}
+
+		async function collect(response: vscode.LanguageModelChatResponse) {
+			let text = '';
+			const calls: vscode.LanguageModelToolCallPart[] = [];
+			for await (const part of response.stream) {
+				if (part instanceof vscode.LanguageModelTextPart) {
+					text += part.value;
+				} else if (part instanceof vscode.LanguageModelToolCallPart) {
+					calls.push(part);
+				}
+			}
+			return { text, calls };
+		}
+
+		async function openSavedPython(content: string) {
+			const uri = vscode.Uri.file(path.join(os.tmpdir(), `aifirst-host-test-${Date.now()}.py`));
+			await vscode.workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
+			const editor = await vscode.window.showTextDocument(uri);
+			const end = editor.document.positionAt(content.length);
+			editor.selection = new vscode.Selection(end, end);
+			return editor;
+		}
+
+		test('Local harness shape: a saved file gets one replace_string_in_file call over the whole file', async () => {
+			const editor = await openSavedPython('# scratch\n\n');
+			const step = getBookContent().steps.find(s => s.id === 'py-2-08')!;
+			const response = await (await model()).sendRequest(
+				[vscode.LanguageModelChatMessage.User(`<context>\nThe current date is 2026-11-27.\n</context>\n<userRequest>\n${PROMPT}\n</userRequest>\n`)],
+				{ tools: [EDIT_TOOL], toolMode: vscode.LanguageModelChatToolMode.Auto }
+			);
+			const { text, calls } = await collect(response);
+			assert.strictEqual(text, '');
+			assert.strictEqual(calls.length, 1);
+			assert.deepStrictEqual(calls[0].input, {
+				filePath: editor.document.uri.fsPath,
+				oldString: '# scratch\n\n',
+				newString: `# scratch\n\n${step.response}\n`,
+			});
+			assert.strictEqual(editor.document.getText(), '# scratch\n\n', 'the provider never edits the document itself');
+		});
+
+		test('an empty saved file gets a replace_string_in_file call with an empty oldString', async () => {
+			const editor = await openSavedPython('');
+			const step = getBookContent().steps.find(s => s.id === 'py-2-08')!;
+			const response = await (await model()).sendRequest(
+				[vscode.LanguageModelChatMessage.User(`<prompt>\n${PROMPT}\n</prompt>\n`)],
+				{ tools: [EDIT_TOOL], toolMode: vscode.LanguageModelChatToolMode.Auto }
+			);
+			const { calls } = await collect(response);
+			// An empty file takes the platform's default line ending (CRLF on Windows).
+			const eol = editor.document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+			assert.deepStrictEqual(calls.map(c => c.input), [{
+				filePath: editor.document.uri.fsPath,
+				oldString: '',
+				newString: `${step.response}\n`.replace(/\n/g, eol),
+			}]);
+		});
+
+		test('the follow-up after an applied edit is acknowledged, not answered with the code again', async () => {
+			const response = await (await model()).sendRequest([
+				vscode.LanguageModelChatMessage.User(`<userRequest>${PROMPT}</userRequest>`),
+				vscode.LanguageModelChatMessage.Assistant([new vscode.LanguageModelToolCallPart('aifirst_1', 'replace_string_in_file', {})]),
+				vscode.LanguageModelChatMessage.User([new vscode.LanguageModelToolResultPart('aifirst_1', [
+					new vscode.LanguageModelTextPart('The following files were successfully edited:\n/tmp/a.py\n'),
+				])]),
+			], { tools: [EDIT_TOOL] });
+			const { text, calls } = await collect(response);
+			assert.strictEqual(calls.length, 0);
+			assert.match(text, /^Inserted the book example\./);
+		});
+
+		test('Copilot harness shape: an untitled file gets the code as text plus how to insert it', async () => {
+			const document = await vscode.workspace.openTextDocument({ content: '', language: 'python' });
+			await vscode.window.showTextDocument(document);
+			const step = getBookContent().steps.find(s => s.id === 'py-2-08')!;
+			const response = await (await model()).sendRequest(
+				[vscode.LanguageModelChatMessage.User(`<current_datetime>2026-11-27T18:29:45.229-08:00</current_datetime>\n\n${PROMPT}`)],
+				{ tools: [EDIT_TOOL] }
+			);
+			const { text, calls } = await collect(response);
+			assert.strictEqual(calls.length, 0, 'untitled files are never edited through the tool (it forces Save As)');
+			assert.ok(text.startsWith(`\`\`\`python\n${step.response}\n\`\`\`\n`));
+			assert.match(text, /Find Book Example/);
+			assert.strictEqual(document.getText(), '');
+		});
+
+		test('Required tool mode with no editable target fails with an actionable error', async () => {
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+			const response = await (await model()).sendRequest(
+				[vscode.LanguageModelChatMessage.User(PROMPT)],
+				{ tools: [EDIT_TOOL], toolMode: vscode.LanguageModelChatToolMode.Required }
+			);
+			await assert.rejects(collect(response), /Find Book Example/);
+		});
 	});
 
 	suite('Find Book Example insertion', () => {
