@@ -134,6 +134,21 @@ suite('Extension Test Suite', () => {
 			assert.strictEqual(editor.document.getText(), '# scratch\n\n', 'the provider never edits the document itself');
 		});
 
+		test('an empty saved file gets a replace_string_in_file call with an empty oldString', async () => {
+			const editor = await openSavedPython('');
+			const step = getBookContent().steps.find(s => s.id === 'py-2-08')!;
+			const response = await (await model()).sendRequest(
+				[vscode.LanguageModelChatMessage.User(`<prompt>\n${PROMPT}\n</prompt>\n`)],
+				{ tools: [EDIT_TOOL], toolMode: vscode.LanguageModelChatToolMode.Auto }
+			);
+			const { calls } = await collect(response);
+			assert.deepStrictEqual(calls.map(c => c.input), [{
+				filePath: editor.document.uri.fsPath,
+				oldString: '',
+				newString: `${step.response}\n`,
+			}]);
+		});
+
 		test('the follow-up after an applied edit is acknowledged, not answered with the code again', async () => {
 			const response = await (await model()).sendRequest([
 				vscode.LanguageModelChatMessage.User(`<userRequest>${PROMPT}</userRequest>`),

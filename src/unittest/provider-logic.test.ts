@@ -54,6 +54,7 @@ const PROMPT_FIXTURES: [run: string, name: string, prompt: string][] = [
 	[SIGNED_IN, 'copilot-harness-chat-panel-signed-in', PY_PROMPT],
 	[SIGNED_IN, 'copilot-harness-java-prompt', JAVA_PROMPT],
 	[SIGNED_IN, 'agents-window', PY_PROMPT],
+	[SIGNED_IN, 'inline-chat-empty-saved-file', JAVA_PROMPT],
 ];
 
 for (const [run, name, prompt] of PROMPT_FIXTURES) {
@@ -160,10 +161,19 @@ test('the inserted code ends its line and follows CRLF documents', () => {
 	assert.equal(planEdit(editor('# s\r\n', 5, 5, { eol: '\r\n' }), 'a\nb')?.newString, '# s\r\na\r\nb\r\n');
 });
 
-test('untitled, empty and non-file documents get text, not an edit', () => {
+test('untitled and non-file documents get text, not an edit', () => {
 	assert.equal(planEdit(editor('x', 1, 1, { isUntitled: true, scheme: 'untitled' }), 'y'), undefined);
-	assert.equal(planEdit(editor(''), 'y'), undefined);
 	assert.equal(planEdit(editor('x', 1, 1, { scheme: 'aifirst-example' }), 'y'), undefined);
+});
+
+test('an empty saved file is edited with an empty oldString, as captured in the lab', () => {
+	assert.deepEqual(planEdit(editor(''), 'print(1)'), { filePath: '/w/a.py', oldString: '', newString: 'print(1)\n' });
+	const captured = fixture(SIGNED_IN, 'local-harness-empty-file-tool-result').messages as { content: { kind: string; input?: unknown }[] }[];
+	const call = captured.flatMap(m => m.content).find(p => p.kind === 'toolCall');
+	const step = steps.find(s => s.id === 'py-2-08')!;
+	assert.deepEqual(call?.input, { filePath: '/home/copilot/lab/ws/scratch.py', oldString: '', newString: `${step.response}\n` });
+	assert.equal(classifyTurn(captured).kind, 'toolResult');
+	assert.equal((classifyTurn(captured) as { outcome: string }).outcome, 'applied');
 });
 
 test('the fenced response is byte-identical to the book code', () => {

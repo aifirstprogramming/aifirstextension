@@ -183,12 +183,15 @@ export interface EditInput {
  * edit unambiguously.
  *
  * The whole file is the `oldString`, so the match is always unique (a selected
- * snippet can occur more than once). An untitled or empty file has nothing to
- * match, and the tool forces a Save As for untitled files (1.148 lab, B5), so
- * those get text instead. The provider never edits the document itself.
+ * snippet can occur more than once). For an empty saved file that is the empty
+ * string, which the tool accepts as "write this content" in both inline chat
+ * and the Local harness (1.148 lab, `inline-chat-empty-saved-file` and
+ * `local-harness-empty-file-tool-result`). Untitled files get text instead,
+ * because the tool forces a Save As for them (1.148 lab, B5). The provider
+ * never edits the document itself.
  */
 export function planEdit(editor: EditorSnapshot, response: string): EditInput | undefined {
-	if (editor.isUntitled || editor.scheme !== 'file' || editor.text.length === 0) {
+	if (editor.isUntitled || editor.scheme !== 'file') {
 		return undefined;
 	}
 	const before = editor.text.slice(0, editor.selectionStart);

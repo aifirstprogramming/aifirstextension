@@ -22,6 +22,8 @@ Fixtures written by `aiFirst.captureFixtures`. Redacted: every system prompt and
 - `agents-window.json`: the Agents window, 79 tools.
 - `local-harness-tool-result-success.json`: the follow-up request after `replace_string_in_file` applied an edit to `scratch.py`.
 - `local-harness-tool-result-skipped.json`: the follow-up after the reader pressed Skip on the edit-outside-workspace confirmation.
+- `inline-chat-empty-saved-file.json`: inline chat in an empty saved `Reminder.java` (Java prompt). With the Phase 2 build patched to allow empty files, `replace_string_in_file` with an empty `oldString` produced the exact book code with Keep/Undo.
+- `local-harness-empty-file-tool-result.json`: the follow-up after the same empty-`oldString` edit in the Local harness: the usual "successfully edited" result, and the file holds the exact code.
 - `local-harness-tool-result-read-only-file.json`: the follow-up after an edit to a read-only file. It reports success; only the save failed.
 
 Screenshots. The Agents window's start page greets the account by name, so it is not included.
@@ -37,3 +39,6 @@ Screenshots. The Agents window's start page greets the account by name, so it is
 - 09: read-only file: edit shown, save failed.
 - 10: Agents window answer.
 - 11: Java answer in the Copilot harness.
+- 12: the chat code block's **Apply in Editor**: a Copilot model merged the code and deleted the file's existing `# scratch` line.
+- 13: inline chat signed in starts on **Auto** and answered the Java prompt with AI-written code.
+- 14: inline chat with AI First in an empty saved `Reminder.java` (empty-`oldString` build): exact code with Keep/Undo.
