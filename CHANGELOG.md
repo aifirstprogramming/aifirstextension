@@ -1,21 +1,21 @@
-## Unreleased
+## 1.12.0 - 2026-11-28
 
-Groundwork for VS Code's move from the Local to the Copilot agent harness (the Local harness is removed in February 2027).
+Keeps the extension working as VS Code replaces its Local agent harness with the Copilot harness (the Local harness is removed in February 2027), and adds a way to insert book code that needs no Copilot at all.
 
 - Added: **AI First: Find Book Example…** (`Ctrl+Alt+Shift+B` / `Cmd+Alt+Shift+B`, also in the editor context menu). Paste a book prompt, preview the matched code, then Insert, Copy, or Open in New Editor. Needs no Copilot, sign-in, or network. Insert follows the file's line endings, can be undone, and refuses if the file changed after matching.
 - Added: **Insert into Editor** button on each response in the example viewer.
 - Added: `aiFirst.trace` setting and an "AI First Programming" output channel. Tracing logs the shape of chat requests (roles, part types, offered tools, tool mode), never prompt text or file contents.
-- Changed: Syntax highlighting in the example viewer is bundled (Prism 1.30.0) instead of loaded from a CDN, so the viewer works offline. The viewer now has a content security policy, and Copy runs through VS Code's clipboard.
-- Changed: The Books panel and all commands register before the chat model, so a failure in the language model API can no longer disable them.
-- Changed: Minimum VS Code version is now 1.104, where the language model provider API became stable.
-- Changed: README no longer says Copilot Business/Enterprise can never work, or that the chat model is free of all AI usage.
 - Fixed: In agent chat, after the AI First model inserts a book example, the next turn no longer answers "Could not extract text from user message." It says the example was inserted (choose Keep or Undo), or that the edit was skipped or failed and how to insert it with Find Book Example. The edit is never repeated.
-- Fixed: Prompts wrapped by the Copilot harness (a leading date, attached-file notes after the prompt) and the Local harness are unwrapped before matching, so they hit the exact-match tier instead of matching inside the wrapper text.
+- Fixed: Prompts wrapped by the Copilot harness (a leading date, attached-file notes after the prompt) and the Local harness are unwrapped before matching, so they match the book prompt exactly instead of matching inside the wrapper text.
 - Changed: The chat model no longer edits untitled files through chat (VS Code forced a Save As and could strand the code in a second untitled tab). It answers with the code and how to insert it with Find Book Example, which is also what the Copilot harness shows, since it offers no edit tool the model supports yet. Empty saved files are still edited, now without first inserting a placeholder line.
 - Changed: Inserted code ends its line, and edits replace the whole file text so a selection that appears twice is still unambiguous.
-- Changed: A request that requires a tool call but has no editable target now fails with a message pointing to Find Book Example. Cancelled requests and closed response streams stop streaming, and a closed stream is logged.
+- Changed: A request that requires a tool call but has no editable target fails with a message pointing to Find Book Example. Cancelled requests and closed response streams stop streaming, and a closed stream is logged.
 - Changed: The model's tooltip and detail say it returns exact book examples and is not an AI model.
-- Changed: README and the Get Started walkthrough lead with Find Book Example. The chat instructions now say to choose AI First in each chat (VS Code keeps separate choices per harness, inline chat and Agents window, and new chats can start on Auto or Copilot Fusion), to use **Insert At Cursor** rather than **Apply in Editor** (which merges the code with a Copilot model), to save the file before inline chat, and what to do when the `chat.agentHost.byokModels.enabled` setting hides the model. A GitHub sign-in is no longer described as required, and a compatibility table is added.
+- Changed: README and the Get Started walkthrough lead with Find Book Example. The chat instructions say to choose AI First in each chat (VS Code keeps separate choices per harness, inline chat and Agents window, and new chats can start on Auto or Copilot Fusion), to use **Insert At Cursor** rather than **Apply in Editor** (which merges the code with a Copilot model), to save the file before inline chat, and what to do when the `chat.agentHost.byokModels.enabled` setting hides the model. A GitHub sign-in is no longer described as required, Copilot Business/Enterprise is described as possibly blocked by policy rather than never working, and a compatibility table is added.
+- Changed: Syntax highlighting in the example viewer is bundled (Prism 1.30.0) instead of loaded from a CDN, so the viewer works offline. The viewer has a content security policy, and Copy runs through VS Code's clipboard.
+- Changed: The Books panel and all commands register before the chat model, so a failure in the language model API can no longer disable them.
+- Changed: Minimum VS Code version is now 1.104, where the language model provider API became stable.
+
 ## 1.11.0 - 2026-09-12
 
 Sync content to v2.0.0 (164 -> 163 prompts). 163 carried, 0 changed, 0 added, 1 retired.
