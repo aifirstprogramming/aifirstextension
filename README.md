@@ -1,21 +1,19 @@
 # AI First Programming Extension
 
-A companion extension for the AI First Programming book series that provides easy access to book examples, prompts, and code responses. The extension includes a Language Model Chat Provider that returns exact code examples from the books, allowing you to practice with AI features in VS Code without using your Copilot token quota.
+A companion extension for the AI First Programming book series. It gives you every prompt and code example from the books, and puts the exact book code into your file when you ask for it. **Find Book Example** does that with no Copilot, no sign-in and no network. If you use VS Code's chat, the **AI First Programming** chat model answers book prompts with the book's code instead of an AI answer.
 
 ## Features
 
-- **Book Content Browser**: Navigate through book content organized by book, section, chapter, and example in a convenient sidebar tree view
-- **Example Viewer**: View detailed prompts and code responses with syntax highlighting
-- **Copy Functionality**: Easily copy prompts and responses to use in your code editor
-- **Find Book Example**: Paste a prompt from the book and insert its exact code into your file, with no Copilot, sign-in, or network needed
-- **AI First Programming Model**: A custom language model that returns exact code examples from the books
-- **Language-Aware Matching**: Automatically matches prompts based on your active editor's programming language
-- **No AI Credits for Book Code**: Find Book Example never calls a model, and the AI First Programming model answers from the book instead of an AI service
+- **Find Book Example**: paste a prompt from the book and insert its exact code into your file. No Copilot, sign-in, network or AI credits needed
+- **Book Content Browser**: navigate the books by section, chapter and example in a sidebar tree view
+- **Example Viewer**: prompts and code with syntax highlighting, with Copy and Insert into Editor buttons
+- **AI First Programming chat model**: pick it in VS Code's chat and a book prompt returns the book's code
+- **Language-aware matching**: a Python file gets the Python book's code, a Java file the Java book's
 
 ## Requirements
 
-- Visual Studio Code version 1.104.0 or later
-- Optional: GitHub Copilot (the Free plan works), only for using the AI First Programming model in VS Code's chat. The Books panel, the example viewer, and Find Book Example work without it.
+- Visual Studio Code 1.104.0 or later
+- For the chat model only: GitHub Copilot Chat, which is built into current VS Code (install the **GitHub Copilot Chat** extension on older versions). A GitHub sign-in is optional: the AI First model works signed out, and a personal Copilot Free account also works. The Books panel, the example viewer and Find Book Example need none of this.
 
 ## Installation
 
@@ -31,47 +29,11 @@ After installation, you'll see a new icon in the sidebar with a picture of a boo
 
 > **Note**: The extension is available in the [VS Code Extension Marketplace](https://marketplace.visualstudio.com/items?itemName=AIFirstProgramming.ai-first-programming).
 
-## Using the Plugin
+## Getting Book Code into Your File
 
-### Browsing Book Content
+### Find Book Example (always works)
 
-1. Click the **AI First Programming** icon in the sidebar (the book icon with "A" and "I")
-2. Navigate through the hierarchical structure:
-   - **Books** → **Sections** → **Chapters** → **Examples**
-3. Click on any example to view its details in a webview panel
-
-### Viewing Examples
-
-When you click on an example, a panel will open showing:
-- **Example Title and Description**
-- **Prompts**: The exact prompts used in the book
-- **Responses**: The corresponding code responses with syntax highlighting
-
-### Copying Prompts and Responses
-
-Each example view includes copy buttons:
-- **Copy Prompt**: Copies the prompt text to your clipboard
-- **Copy Response**: Copies the code response to your clipboard
-
-You can then use the prompt in either of two ways:
-
-**Inline chat (recommended for inserting code directly):**
-1. Open a new editor (`Ctrl+N` / `Cmd+N`)
-2. Press `Ctrl+I` / `Cmd+I` to open the inline chat above your cursor
-3. Paste the prompt and press Enter — the book example is inserted with a native Keep/X review overlay
-
-**Chat panel (recommended for reading and comparing):**
-1. Open GitHub Copilot Chat with `Ctrl+Shift+I` / `Cmd+Shift+I`
-2. Paste the prompt and press Enter
-3. The response appears as a code block with **Insert at Cursor** / **Apply** buttons
-
-> **Tip**: We recommend always trying the prompt first, but don't hesitate to use the book response if needed!
-
-Each response in the example view also has an **Insert into Editor** button, which puts the code into the last file you were editing after you confirm.
-
-### Finding a Book Example (no Copilot needed)
-
-This always works, whatever your Copilot setup, and doesn't use any AI credits:
+This works whatever your Copilot setup, and never uses AI credits:
 
 1. Open the file you want the code in (a new untitled file is fine) and place your cursor, or select code to replace
 2. Run **AI First: Find Book Example…** from the Command Palette, the editor's right-click menu, or with `Ctrl+Alt+Shift+B` (`Cmd+Alt+Shift+B` on Mac)
@@ -80,71 +42,77 @@ This always works, whatever your Copilot setup, and doesn't use any AI credits:
 
 Matching uses your file's language, so a Python file gets the Python book's code. Insert is a normal edit: `Ctrl+Z` / `Cmd+Z` undoes it. If the file changed after the example was matched, nothing is inserted and you'll be asked to run the command again.
 
-## Enabling the AI First Programming Model
+### Browsing the Books
 
-The AI First Programming extension includes a custom language model that returns exact code examples from the books. This feature allows you to practice using AI features in VS Code without using your Copilot token quota.
+1. Click the **AI First Programming** icon in the sidebar (the book icon with "A" and "I")
+2. Navigate **Books** → **Sections** → **Chapters** → **Examples**
+3. Click an example to open it beside your editor, with its prompts and code responses
 
-### Step 1: Open an AI Prompt
+Each example has **Copy Prompt** and **Copy Response** buttons, and each response has an **Insert into Editor** button that puts the code into the last file you were editing after you confirm.
 
-1. Open any file in VS Code
-2. Bring up an AI prompt by typing:
-   - **Mac**: `Cmd+I`
-   - **Windows/Linux**: `Ctrl+I`
+> **Tip**: We recommend always trying the prompt first, but don't hesitate to use the book response if needed!
 
-### Step 2: Access Model Selection
+## Using the AI First Model in VS Code Chat
 
-1. Click on the **model drop-down** dialog in the chat interface, or
-2. Type the keyboard shortcut:
-   - **Mac**: `Cmd+Alt+.`
-   - **Windows/Linux**: `Ctrl+Alt+.`
+VS Code's chat can send your prompt to the **AI First Programming** model instead of an AI model. You then practice the book's workflow, typing prompts into chat, and get exactly the code the book shows.
 
-This will bring up a pick list of available models.
+### 1. Make the model visible
 
-### Step 3: Open Manage Models
+1. Run **Chat: Manage Language Models** from the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+2. Expand the **AI First** group and click the **eye icon** next to **AI First Programming**, so the row is bold
 
-1. In the model selection drop-down, click on **"Manage Models…"** (usually the last item)
-2. This opens the Manage Language Models dialog
+### 2. Choose AI First wherever you chat
 
-### Step 4: Enable AI First Programming
+The model button at the bottom of each chat input shows which model will answer. Click it (or press `Ctrl+Alt+.` / `Cmd+Alt+.`) and choose **AI First Programming**.
 
-1. In the Manage Language Models dialog, expand the **"AI First"** provider group (it should be near the top alphabetically)
-2. Locate the **"AI First Programming"** model row
-3. Click the **eye icon** next to the model — when the row appears in bold, the model is visible in the chat picker. (The older "checkbox" UI was replaced in recent Copilot Chat builds.)
-4. Close the Manage Models dialog — your selection is saved automatically
+Check that button whenever you start a chat. VS Code remembers a separate choice for the chat panel in each agent harness, for inline chat and for the Agents window, and a new chat can start on **Auto** or **Copilot Fusion**. Those are AI models: they write their own code instead of the book's, and with a Copilot account they count against your Copilot usage.
 
-### Step 5: Select the Model
+### 3. Send the book prompt
 
-1. Return to your AI prompt
-2. Click the model selection drop-down again
-3. You should now see **"AI First Programming"** as an available option
-4. Select it to start using the book examples model
+**Chat panel** (`Ctrl+Alt+I` / `Ctrl+Cmd+I`, or the chat icon in the title bar):
 
-### Using the Model
+- With the default **Copilot** agent harness, the book code appears in the chat. Hover over it and click **Insert At Cursor** (or press `Ctrl+Enter`, `Cmd+Enter` on Mac) to put it at your cursor exactly as printed. Avoid **Apply in Editor**: it asks a Copilot model to merge the code into your file, which can change or delete your existing lines.
+- With the **Local** harness (chosen at the bottom of the chat input; VS Code is removing it in February 2027), the book code is inserted into your open saved file. Choose **Keep** or **Undo**.
 
-Once enabled and selected, all your prompts will return the exact code responses that match the book text. Benefits include:
+**Inline chat** (`Ctrl+I` / `Cmd+I` in the editor): save your file first, as a `.py` or `.java` file (an empty file is fine). The book code is inserted at your cursor; choose **Keep** or **Undo**. In an untitled file the code is shown in the inline chat instead, with a reminder to use Find Book Example.
 
-- ✅ **Exact book examples**: Get the same code as shown in the book
-- ✅ **Book answers, not AI answers**: The AI First Programming model answers from the book rather than an AI service. VS Code may still use its own models for background tasks such as naming chats; use Find Book Example if you need a path that makes no AI calls at all
-- ✅ **Language-aware**: Automatically matches prompts based on your active editor's language
-- ✅ **Inline editing**: Use `Ctrl+I` / `Cmd+I` to insert book examples directly into your file with the native Keep/X diff review
-- ✅ **Practice mode**: Perfect for learning AI-assisted coding without worrying about limits
+### If AI First isn't in the model list
 
-> **Caution**: If your GitHub Copilot access comes from an employer (Copilot Business or Enterprise), your administrator's policies may hide models supplied by extensions, including this one. We have not tested those plans. Find Book Example works regardless of your Copilot plan.
+The Copilot agent harness only lists models from extensions while the VS Code setting [`chat.agentHost.byokModels.enabled`](vscode://settings/chat.agentHost.byokModels.enabled) is on. It is on by default, but it is marked experimental, so VS Code can turn it off. When it is off:
+
+- signed out, a prompt fails with "Authentication is required to start a session"
+- signed in, chat quietly switches to Copilot Fusion, which answers with AI-written code
+
+Turn the setting on (restart VS Code if AI First still doesn't appear), or switch the chat to the **Local** harness while it exists. Find Book Example always works.
+
+### Things to know
+
+- **AI usage**: the AI First model never calls an AI service. If you are signed in to GitHub, VS Code can still use Copilot models for its own background tasks, such as naming a chat. Use Find Book Example if you need a path that makes no AI calls at all.
+- **Copilot Business or Enterprise**: if your Copilot access comes from an employer, your administrator's policies may hide models supplied by extensions, including this one. We have not tested those plans. Find Book Example works regardless.
+
+### Compatibility
+
+| | Needs | Tested on |
+|---|---|---|
+| Books panel, example viewer, Find Book Example | VS Code 1.104 or later | 1.104 and 1.148 on Windows, macOS and Linux |
+| AI First model in the chat panel and inline chat | VS Code with Copilot Chat; signed out or a personal Copilot plan | 1.148 |
+| AI First model in the Agents window | A personal Copilot plan | 1.148 |
 
 ## Getting Started Walkthrough
 
 When you first install the extension, VS Code will offer a getting started walkthrough that guides you through:
-1. Enabling the AI First Programming model
+1. Inserting book code with Find Book Example
 2. Exploring the book content
 3. Opening examples
-4. Copying example code
-5. Using examples with GitHub Copilot Chat
+4. Copying example prompts
+5. Making the AI First model visible in chat (optional)
+6. Using the AI First model in chat (optional)
 
 You can access this walkthrough anytime from the VS Code welcome page or by searching for "Get Started with AI First Programming" in the Command Palette.
 
 ## Keyboard Shortcuts
 
-- **Open AI Prompt**: `Cmd+I` (Mac) / `Ctrl+I` (Windows/Linux)
+- **Inline chat**: `Cmd+I` (Mac) / `Ctrl+I` (Windows/Linux)
 - **Model Selection**: `Cmd+Alt+.` (Mac) / `Ctrl+Alt+.` (Windows/Linux)
 - **Find Book Example**: `Cmd+Alt+Shift+B` (Mac) / `Ctrl+Alt+Shift+B` (Windows/Linux)
 - **Focus on AI First Books Panel**: Use the command `ai-first-programming.focus` or click the sidebar icon

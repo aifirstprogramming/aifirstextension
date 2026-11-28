@@ -111,14 +111,14 @@
       {
         "id": "ai-first-programming-getting-started",
         "title": "Get Started with AI First Programming",
-        "description": "Learn how to use this extension as your companion for the AI First Programming book series",
+        "description": "Get book examples into your code, with or without VS Code's chat",
         "steps": [
           {
-            "id": "enable-model-provider",
-            "title": "Enable AI First Programming",
-            "description": "Before you can use the AI First Programming model in VS Code's chat, you need to make it visible in the chat picker.\n\n**Instructions:**\n1. Click the button below to copy the command and open the Command Palette\n2. Paste the command (Ctrl+V / Cmd+V) and press Enter\n3. In the Manage Models view, expand the **AI First** provider group\n4. Click the **eye icon** next to **AI First Programming** — the row should appear in bold once it's visible\n5. Close the dialog, then select the model from the chat model dropdown\n\n[Copy Command & Open Command Palette](command:ai-first-programming.copyManageModelsCommand)",
+            "id": "find-book-example",
+            "title": "Insert Book Code with Find Book Example",
+            "description": "Paste a prompt from the book and insert its exact code into your file. No Copilot, sign-in or network needed.\n\n[Find Book Example](command:ai-first-programming.findExample)",
             "media": {
-              "markdown": "media/walkthrough/enable-model-provider.md"
+              "markdown": "media/walkthrough/find-book-example.md"
             }
           },
           {
@@ -139,16 +139,24 @@
           },
           {
             "id": "copy-example-code",
-            "title": "Copy the Example Code",
-            "description": "Copy the prompt from the example so you can use it to generate code.\n\n**Instructions:**\n1. Click the \"Copy Prompt\" button in the example view\n2. The button will show \"✓ Copied!\" to confirm the prompt is in your clipboard\n3. Open a new editor with `Ctrl+N` (or `Cmd+N` on Mac) to prepare for pasting the prompt",
+            "title": "Copy an Example Prompt",
+            "description": "Click **Copy Prompt** in the example view to copy the book's prompt, then paste it into Find Book Example or into chat. Each response also has an **Insert into Editor** button.",
             "media": {
               "markdown": "media/walkthrough/copy-example-code.md"
             }
           },
           {
+            "id": "enable-model-provider",
+            "title": "Optional: Make the AI First Model Visible in Chat",
+            "description": "To type book prompts into VS Code's chat, make the **AI First Programming** model visible. No GitHub sign-in needed.\n\n1. Click the button to copy the command and open the Command Palette, then paste it and press Enter\n2. Expand the **AI First** group and click the **eye icon** next to **AI First Programming**\n\nIf AI First is still missing from the chat model list, check that this setting is on. Restart VS Code if it still doesn't appear.\n\n[Copy Command & Open Command Palette](command:ai-first-programming.copyManageModelsCommand)\n[Check the setting](command:workbench.action.openSettings?%5B%22chat.agentHost.byokModels.enabled%22%5D)",
+            "media": {
+              "markdown": "media/walkthrough/enable-model-provider.md"
+            }
+          },
+          {
             "id": "use-with-copilot",
-            "title": "Use with GitHub Copilot Chat",
-            "description": "Use the AI First Programming model to generate code from book prompts. Two surfaces work:\n\n**Inline chat (inserts into your editor):**\n1. Open a file and press `Ctrl+I` (or `Cmd+I` on Mac)\n2. Paste the prompt and press Enter\n3. The book example is inserted with a native Keep/X review overlay\n\n**Chat panel (read first, insert later):**\n1. Press `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac)\n2. Paste the prompt and press Enter\n3. Click **Insert at Cursor** or **Apply** on the rendered code block\n\n**Note:** Make sure **AI First Programming** is selected in the model dropdown. The selection sticks across future chats.",
+            "title": "Optional: Use the AI First Model in Chat",
+            "description": "Choose **AI First Programming** with the model button in each chat; VS Code remembers a separate choice per place, and **Auto** or **Copilot Fusion** write AI code instead of the book's.\n\n**Inline chat:** save a `.py` or `.java` file (empty is fine), press `Ctrl+I` (`Cmd+I` on Mac), paste the prompt, then **Keep** or **Undo**.\n\n**Chat panel:** paste the prompt, then hover over the code and click **Insert At Cursor** (`Ctrl+Enter`, `Cmd+Enter` on Mac). Avoid **Apply in Editor**, which asks a Copilot model to merge the code.",
             "media": {
               "markdown": "media/walkthrough/use-with-copilot.md"
             }

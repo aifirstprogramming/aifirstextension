@@ -1,38 +1,12 @@
-## 🤖 Enable AI First Programming
+## Optional: Make the AI First Model Visible in Chat
 
-To use the AI First Programming model in VS Code's chat features, you need to enable and select it first.
+If you want to type book prompts into VS Code's chat, the **AI First Programming** model can answer them with the book's code instead of an AI answer. You don't need a GitHub sign-in for this. Skip this step if you only use Find Book Example.
 
-### Step 1: Open Manage Models
+### Make the model visible
 
-Click the button above to copy the command text and open the Command Palette. Then:
-1. Paste the command (`Ctrl+V` / `Cmd+V`) into the Command Palette
-2. Press `Enter` to execute it
+1. Click the button to copy the command and open the Command Palette, paste it (`Ctrl+V` / `Cmd+V`) and press `Enter`. Or run **Chat: Manage Language Models** yourself.
+2. Expand the **AI First** group and click the **eye icon** next to **AI First Programming**, so the row is bold.
 
-Alternatively, you can manually open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and type "Chat: Manage Language Models".
+### If it doesn't show up in chat
 
-### Step 2: Enable the Model
-
-In the Manage Models interface:
-1. Expand the **"AI First"** provider group (usually near the top alphabetically)
-2. Locate the **"AI First Programming"** model row
-3. Click the **eye icon** next to the model — when the row becomes bold, the model is visible in the chat picker
-
-> **Note**: Recent versions of Copilot Chat replaced the older checkbox with this eye icon. If the model row looks faded, click the eye to make it bold; faded rows are hidden from the chat picker.
-
-### Step 3: Select the Model for Use
-
-1. Close the Manage Models dialog (your visibility choice is saved automatically)
-2. Open inline chat (`Ctrl+I` / `Cmd+I`) or the chat panel (`Ctrl+Shift+I` / `Cmd+Shift+I`)
-3. Open the model dropdown and pick **"AI First Programming"**
-
-### What This Enables
-
-Once enabled and selected, you can:
-- Use the AI First Programming model in VS Code's chat interface
-- Get responses based on examples from the AI First Programming books
-- Access programming examples directly through chat prompts
-
----
-
-**Note**: If you don't see the model listed, make sure the extension is properly installed and reload VS Code.
-
+The default **Copilot** agent harness lists extension models only while the setting `chat.agentHost.byokModels.enabled` is on. It is on by default but experimental, so VS Code can turn it off. Use the **Check the setting** link to open it and turn it on. Restart VS Code if AI First still doesn't appear.
