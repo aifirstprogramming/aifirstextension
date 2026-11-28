@@ -1,35 +1,46 @@
-name: Publish VS Code Extension
+name: Release
+
+# Two stages, so the file readers install is the exact file that was checked:
+#
+# 1. Push a version tag (v1.12.0). CI runs on the tagged commit, the VSIX is
+#    built once, and it is attached with its SHA-256 to a *draft* GitHub
+#    Release. Nothing reaches the Marketplace.
+# 2. Install that VSIX in the lab and run the acceptance checks
+#    (docs/releasing.md). Then run this workflow by hand with the tag. It
+#    downloads the same VSIX, checks the hash, publishes it to the Marketplace
+#    and publishes the GitHub Release.
+#
+# The version comes from package.json, set in a normal pull request. This
+# workflow never commits or pushes.
 
 on:
   push:
     tags:
-      - 'v*.*.*'  # Triggers on version tags like v0.0.1, v1.2.3, etc.
-  workflow_dispatch:  # Allows manual triggering
+      - 'v*.*.*'
+  workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to publish (patch, minor, major, or specific version)'
+      tag:
+        description: 'Tag whose draft release VSIX passed acceptance, e.g. v1.12.0'
         required: true
-        default: 'patch'
         type: string
 
 jobs:
-  # Nothing is published unless the full CI (unit, content gate, host tests on
-  # all three OSes against the minimum and certified Stable builds, packaging)
-  # passes on the commit being published.
+  # Nothing is built for release unless the full CI (unit, content gate, host
+  # tests on all three OSes against the minimum and certified Stable builds,
+  # packaging) passes on the tagged commit.
   ci:
+    if: github.event_name == 'push'
     uses: ./.github/workflows/ci.yml
 
-  publish:
+  build:
     needs: ci
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history for version detection
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -40,88 +51,78 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install vsce
-        run: npm install -g @vscode/vsce
-
-      - name: Determine version
-        id: version
+      - name: Check the tag matches package.json
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION_TYPE="${{ github.event.inputs.version }}"
-            if [ "$VERSION_TYPE" == "patch" ] || [ "$VERSION_TYPE" == "minor" ] || [ "$VERSION_TYPE" == "major" ]; then
-              CURRENT_VERSION=$(node -p "require('./package.json').version")
-              NEW_VERSION=$(npm version $VERSION_TYPE --no-git-tag-version)
-              # npm version returns version with 'v' prefix, strip it
-              NEW_VERSION=${NEW_VERSION#v}
-              echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-              echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
-              echo "version_updated=true" >> $GITHUB_OUTPUT
-            else
-              # Strip 'v' prefix if present
-              VERSION_TYPE=${VERSION_TYPE#v}
-              echo "version=$VERSION_TYPE" >> $GITHUB_OUTPUT
-              echo "version_type=custom" >> $GITHUB_OUTPUT
-              echo "version_updated=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            # Extract version from tag (e.g., v0.0.1 -> 0.0.1)
-            VERSION=${GITHUB_REF#refs/tags/v}
-            # Also handle case where tag doesn't have 'v' prefix
-            VERSION=${VERSION#refs/tags/}
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "version_type=tag" >> $GITHUB_OUTPUT
-            echo "version_updated=false" >> $GITHUB_OUTPUT
+          TAG="${GITHUB_REF_NAME}"
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "v$VERSION" ]; then
+            echo "::error::Tag $TAG does not match package.json version $VERSION. Bump the version in a pull request, then tag that commit."
+            exit 1
           fi
 
-      - name: Update package.json version
+      - name: Package VSIX
         run: |
-          if [ "${{ steps.version.outputs.version_updated }}" == "true" ]; then
-            # Version was already updated by npm version in previous step, just commit it
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add package.json
-            if git diff --staged --quiet; then
-              echo "No changes to commit"
-            else
-              git commit -m "Bump version to ${{ steps.version.outputs.version }}"
-              git push
-            fi
-          else
-            # Version needs to be set manually (tag or custom version)
-            CURRENT_VERSION=$(node -p "require('./package.json').version")
-            TARGET_VERSION="${{ steps.version.outputs.version }}"
-            if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
-              npm version $TARGET_VERSION --no-git-tag-version
-              git config user.name "github-actions[bot]"
-              git config user.email "github-actions[bot]@users.noreply.github.com"
-              git add package.json
-              git commit -m "Bump version to $TARGET_VERSION"
-              git push
-            else
-              echo "Version already set to $TARGET_VERSION, skipping update"
-            fi
+          VSIX="ai-first-programming-${GITHUB_REF_NAME}.vsix"
+          npx --yes @vscode/vsce@3.6.0 package --out "$VSIX"
+          sha256sum "$VSIX" > "$VSIX.sha256"
+          cat "$VSIX.sha256"
+
+      - name: Release notes from CHANGELOG
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            /^## / { if (found) exit; if (index($0, "## " v " ") == 1 || $0 == "## " v) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::CHANGELOG.md has no '## $VERSION' section."
+            exit 1
           fi
 
-      - name: Compile TypeScript
-        run: npm run compile
+      - name: Create draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --draft \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            "ai-first-programming-${GITHUB_REF_NAME}.vsix" \
+            "ai-first-programming-${GITHUB_REF_NAME}.vsix.sha256"
 
-      - name: Package extension
-        run: vsce package
+  publish:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    # Add required reviewers to this environment in the repository settings to
+    # make publishing need a second person's approval.
+    environment: marketplace
+    permissions:
+      contents: write
+    steps:
+      - name: Download the accepted VSIX
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "ai-first-programming-$TAG.vsix" \
+            --pattern "ai-first-programming-$TAG.vsix.sha256"
+          sha256sum --check "ai-first-programming-$TAG.vsix.sha256"
 
-      - name: Publish to Marketplace
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Publish to the Marketplace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: |
-          if [ "${{ steps.version.outputs.version_type }}" == "tag" ]; then
-            vsce publish -p $VSCE_PAT
-          else
-            vsce publish ${{ steps.version.outputs.version }} -p $VSCE_PAT
-          fi
+          TAG: ${{ inputs.tag }}
+        run: npx --yes @vscode/vsce@3.6.0 publish --packagePath "ai-first-programming-$TAG.vsix"
 
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: extension-vsix
-          path: '*.vsix'
-          retention-days: 30
-
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
