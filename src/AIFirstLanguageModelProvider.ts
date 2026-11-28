@@ -40,7 +40,7 @@ export class AIFirstLanguageModelProvider implements vscode.LanguageModelChatPro
 		progress: vscode.Progress<vscode.LanguageModelResponsePart>,
 		token: vscode.CancellationToken
 	): Promise<void> {
-		// Diagnostics only (aiFirst.trace / aiFirst.trace.captureFixtures); no behavior change.
+		// Diagnostics only (aiFirst.trace / aiFirst.captureFixtures); no behavior change.
 		const requestId = `${Date.now().toString(36)}-${++requestCounter}`;
 		traceRequest(requestId, messages, options);
 		await captureFixture(requestId, messages, options);

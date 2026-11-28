@@ -67,7 +67,7 @@
           "default": false,
           "markdownDescription": "Log the shape of each request VS Code sends to the AI First chat model (message roles, part types, offered tools, tool mode, matched example) to the **AI First Programming** output channel. Never logs your prompt text or file contents. Useful when reporting a problem with the chat model."
         },
-        "aiFirst.trace.captureFixtures": {
+        "aiFirst.captureFixtures": {
           "type": "boolean",
           "default": false,
           "markdownDescription": "For extension maintainers testing compatibility only. Saves each full chat request, **including prompt text**, as JSON under the extension's global storage folder. Leave off."
