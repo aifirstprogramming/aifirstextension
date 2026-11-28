@@ -1,21 +1,20 @@
-## 🤖 Use with GitHub Copilot Chat
+## Optional: Use the AI First Model in Chat
 
-You can use the AI First Programming model in two surfaces: **inline chat** (inserts code directly into your editor) or **chat panel** (renders code with Insert / Apply buttons). Pick whichever fits your workflow.
+### Choose AI First every time
 
-### Option A — Inline Chat (insert directly into your editor)
+The model button at the bottom of the chat input shows which model will answer. Click it (or press `Ctrl+Alt+.` / `Cmd+Alt+.`) and choose **AI First Programming**. VS Code remembers a separate choice for each place you chat, so check it whenever you start a new chat. **Auto** and **Copilot Fusion** are AI models: they write their own code, not the book's.
 
-1. Open the file you want to write in (a new untitled file is fine)
-2. Press `Ctrl+I` (or `Cmd+I` on Mac) to open the inline chat above your cursor
-3. Paste the prompt and press `Enter`
-4. The book example is inserted into your file with the native **Keep / X** review overlay — click Keep to accept, X to discard
+### Inline chat (inserts into your file)
 
-### Option B — Chat Panel (read first, insert later)
+1. Save your file first as a `.py` or `.java` file. An empty file is fine.
+2. Press `Ctrl+I` (`Cmd+I` on Mac), paste the prompt and press `Enter`.
+3. The book code is inserted at your cursor. Choose **Keep** or **Undo**.
 
-1. Press `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac) to open the chat panel
-2. Paste the prompt and press `Enter`
-3. The response appears as a code block in the chat
-4. Click **Insert at Cursor** or **Apply** on the code block to add it to your editor
+In an untitled file the code is shown in the inline chat instead.
 
----
+### Chat panel
 
-**Note:** Make sure the AI First Programming model is selected in whichever surface you're using. Click the model dropdown and pick **"AI First Programming"** — the model you enabled in step 1. The selection sticks across future chats.
+1. Open the chat panel, paste the prompt and press `Enter`.
+2. Hover over the code and click **Insert At Cursor** (or press `Ctrl+Enter`, `Cmd+Enter` on Mac). Avoid **Apply in Editor**: it asks a Copilot model to merge the code, which can change your existing lines.
+
+With the **Local** agent harness (until VS Code removes it in February 2027) the code is inserted into your open saved file instead, with **Keep** and **Undo**.
